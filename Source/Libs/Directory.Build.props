@@ -31,6 +31,11 @@
          has to have one too: pack fails when the file is missing, which is the
          right way round. -->
 		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<!-- The explicit None below packs README.md at the package root. Without this
+		     exclude the SDK default None glob picks it up as well, NuGet sees two
+		     items for the same target path and the package ships it twice, which
+		     nuget.org rejects as a duplicated file. -->
+		<DefaultItemExcludes>$(DefaultItemExcludes);README.md</DefaultItemExcludes>
 	</PropertyGroup>
 
 	<ItemGroup>

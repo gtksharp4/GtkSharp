@@ -8,6 +8,7 @@ GtkSharp is a C# wrapper for Gtk and its related components. The component list 
 |:----------|:------------|:---------------------|:-----------------------------------------------------------|
 | `develop` | Gtk 3.24    | `3.24.24.x`          | Gtk 3 maintenance line.                                     |
 | `gtk4`    | Gtk 4.22.4  | `4.22.4.x`           | Gtk 4 upgrade, in progress — see [Docs/gtk4-upgrade-plan.md](Docs/gtk4-upgrade-plan.md). |
+| `net4x.gtk4` | Gtk 4.22.4 | `4.22.4.x`         | `gtk4` plus `Sharp4` package ids and Net4x.NuGetUtility packaging; the line the [NuGet packages](#nuget-packages) below come from. |
 
 The Gtk 4 line is a hard break: same assembly names and namespaces, no side-by-side install with the 3.24.x packages.
 

@@ -1,4 +1,4 @@
-// A tour of Docs/getting-started.md, as a running application.
+// A tour of docs/getting-started.md, as a running application.
 //
 // Every page under Pages/ corresponds to one section of that document, and
 // demonstrates it by doing it rather than by describing it -- including the
@@ -70,7 +70,7 @@ namespace GettingStarted
                 Modal = true,
                 ProgramName = "GtkSharp Getting Started Tour",
                 Version = "4.22",
-                Comments = "Every page here is one section of Docs/getting-started.md, "
+                Comments = "Every page here is one section of docs/getting-started.md, "
                          + "running rather than described.",
                 Website = "https://github.com/GtkSharp/GtkSharp",
                 WebsiteLabel = "GtkSharp/GtkSharp",

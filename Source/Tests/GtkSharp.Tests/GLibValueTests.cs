@@ -10,7 +10,7 @@ namespace GtkSharp.Tests
     /// </summary>
     /// <remarks>
     /// 806 hand-written lines, roughly twenty constructors against roughly twenty
-    /// explicit conversions, and `Docs/coverage.md` names it the first place
+    /// explicit conversions, and `docs/coverage.md` names it the first place
     /// worth more tests. A wrong conversion here is *silent*: you get a default
     /// or a truncated value rather than an error, and it surfaces as a property
     /// that will not take the number you gave it.

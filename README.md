@@ -2,12 +2,14 @@
 
 GtkSharp is a C# wrapper for Gtk and its related components. The component list includes the following libraries: glib, gio, cairo, pango, graphene, gdk, gsk. This is a fork of https://github.com/mono/gtk-sharp and is maintained completely separately from that project.
 
+Documentation: https://gtksharp4.github.io/GtkSharp/ (source: [docs/index.md](docs/index.md)).
+
 ## Branches
 
 | Branch    | Gtk version | Package version line | Status                                                     |
 |:----------|:------------|:---------------------|:-----------------------------------------------------------|
 | `develop` | Gtk 3.24    | `3.24.24.x`          | Gtk 3 maintenance line.                                     |
-| `gtk4`    | Gtk 4.22.4  | `4.22.4.x`           | Gtk 4 upgrade, in progress — see [Docs/gtk4-upgrade-plan.md](Docs/gtk4-upgrade-plan.md). |
+| `gtk4`    | Gtk 4.22.4  | `4.22.4.x`           | Gtk 4 upgrade, in progress — see [docs/gtk4-upgrade-plan.md](docs/gtk4-upgrade-plan.md). |
 | `net4x.gtk4` | Gtk 4.22.4 | `4.22.4.x`         | `gtk4` plus `Sharp4` package ids and Net4x.NuGetUtility packaging; the line the [NuGet packages](#nuget-packages) below come from. |
 
 The Gtk 4 line is a hard break: same assembly names and namespaces, no side-by-side install with the 3.24.x packages.
@@ -93,7 +95,7 @@ dotnet new gtkapp
 | `GtkSharp4.Runtime`                            | Runtime pack (implementation assemblies)                |
 | `GtkSharp4.Workload.Template.CSharp`/`FSharp`/`VBNet` | Templates installed with the workload            |
 
-Install from the local packages: `dotnet cake build.cake --BuildTarget=InstallPackedWorkload` — see [Docs/workload-install.md](Docs/workload-install.md).
+Install from the local packages: `dotnet cake build.cake --BuildTarget=InstallPackedWorkload` — see [docs/workload-install.md](docs/workload-install.md).
 
 ## License
 

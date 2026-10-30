@@ -282,7 +282,7 @@ namespace GtkSharp.Generation {
 		/// It does NOT suppress compiler warnings, and it does NOT exclude
 		/// anything from code coverage -- coverlet has never read it. Coverage
 		/// exclusion is configured in
-		/// Source/Tests/GtkSharp.Tests/coverlet.runsettings; see Docs/coverage.md.
+		/// Source/Tests/GtkSharp.Tests/coverlet.runsettings; see docs/coverage.md.
 		/// </remarks>
 		static void WriteCSharpHeader (StreamWriter sw)
 		{

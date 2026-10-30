@@ -10,7 +10,7 @@ namespace GtkSharp.Tests
     /// widget renders.
     /// </summary>
     /// <remarks>
-    /// <c>Docs/getting-started.md</c> has a whole section on this and the suite
+    /// <c>docs/getting-started.md</c> has a whole section on this and the suite
     /// had no mention of <c>DrawingArea</c> or <c>SetDrawFunc</c> at all. It is
     /// the most common thing an application does beyond arranging widgets, and it
     /// crosses every boundary in the binding at once: a delegate marshalled into

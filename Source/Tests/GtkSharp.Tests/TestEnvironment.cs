@@ -56,7 +56,7 @@ namespace GtkSharp.Tests
         /// <para>
         /// The run then ends mid-suite with a truncated total under a "Passed!"
         /// line, which is indistinguishable at the console from the finalizer
-        /// crashes documented in <c>Docs/testing.md</c>.
+        /// crashes documented in <c>docs/testing.md</c>.
         /// </para>
         /// <para>
         /// There is a documented escape — <c>WEBKIT_DISABLE_SANDBOX_THIS_IS_DANGEROUS</c>

@@ -16,7 +16,7 @@ namespace GtkSharp.Tests
     /// covered what happens after them: <c>ListView</c>, <c>MultiSelection</c>,
     /// <c>NoSelection</c>, <c>ListItem</c> and <c>Bitset</c> had no mention in the
     /// suite at all, and <c>ListView</c> is the widget
-    /// <c>Docs/getting-started.md</c> tells people to use instead of
+    /// <c>docs/getting-started.md</c> tells people to use instead of
     /// <c>TreeView</c>.
     ///
     /// A <c>Bitset</c> is the only thing a selection model will tell you about a

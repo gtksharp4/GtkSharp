@@ -17,7 +17,7 @@
   application will ever call, so its coverage is a number nobody can act on. At
   233k generated lines against 22k hand-written, leaving it in drags the reported
   figure from about 66 per cent down to about 17, and hides the one that matters.
-  See Docs/coverage.md.
+  See docs/coverage.md.
 
   Note for editors: an XML comment may not contain two consecutive hyphens.
   VSTest rejects the whole file if it does, with "Settings file provided does not

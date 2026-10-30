@@ -45,13 +45,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{D2229930-178D-48FB-B77B-DB22FFD7EB76}"
 	ProjectSection(SolutionItems) = preProject
-		..\Docs\architecture.md = ..\Docs\architecture.md
-		..\Docs\article-building-gtk4-desktop-apps-in-csharp.md = ..\Docs\article-building-gtk4-desktop-apps-in-csharp.md
-		..\Docs\coverage.md = ..\Docs\coverage.md
-		..\Docs\getting-started.md = ..\Docs\getting-started.md
-		..\Docs\index.md = ..\Docs\index.md
-		..\Docs\migrating-to-gtk4.md = ..\Docs\migrating-to-gtk4.md
-		..\Docs\testing.md = ..\Docs\testing.md
+		..\docs\architecture.md = ..\docs\architecture.md
+		..\docs\article-building-gtk4-desktop-apps-in-csharp.md = ..\docs\article-building-gtk4-desktop-apps-in-csharp.md
+		..\docs\coverage.md = ..\docs\coverage.md
+		..\docs\getting-started.md = ..\docs\getting-started.md
+		..\docs\index.md = ..\docs\index.md
+		..\docs\migrating-to-gtk4.md = ..\docs\migrating-to-gtk4.md
+		..\docs\testing.md = ..\docs\testing.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sample", "Sample", "{0F1FA063-B515-4B53-A547-3E045797C624}"

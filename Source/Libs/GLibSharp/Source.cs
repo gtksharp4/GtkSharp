@@ -108,7 +108,7 @@ namespace GLib {
 		/// called this. Throwing is strictly better than what it did: a custom
 		/// GSource needs the four missing members bound, the delegates kept
 		/// alive, and the vtable left allocated for as long as the source lives.
-		/// See Docs/testing.md.
+		/// See docs/testing.md.
 		/// </para>
 		/// </remarks>
 		public Source (GLib.SourceFuncs source_funcs, uint struct_size)

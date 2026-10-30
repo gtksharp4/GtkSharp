@@ -8,7 +8,7 @@
   (for example the GtkSharp.Template.CSharp 3.x package, which reuses the same
   template identity) cannot shadow the workload's.
 .PARAMETER Sdk
-  The SDK directory the workload was installed into (see Docs/workload-install.md).
+  The SDK directory the workload was installed into (see docs/workload-install.md).
 .PARAMETER Packages
   Folder holding the packed GtkSharp4 packages, used as a restore source.
 #>

@@ -13,7 +13,7 @@ no amount of building `GtkSharp.sln` could have caught it.
 
 | Sample | What it covers |
 |:--|:--|
-| [GettingStarted](GettingStarted/) | One page per section of [`Docs/getting-started.md`](../Docs/getting-started.md), demonstrated by running rather than described. |
+| [GettingStarted](GettingStarted/) | One page per section of [`docs/getting-started.md`](../docs/getting-started.md), demonstrated by running rather than described. |
 
 ## Building
 

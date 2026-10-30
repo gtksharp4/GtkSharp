@@ -17,7 +17,7 @@ namespace GtkSharp.Tests
     /// <see cref="TestEnvironment.WebKitUsable"/>, so it skips on Windows, where
     /// gvsbuild ships no WebKit, and in a container that cannot create the user
     /// namespace WebKit's sandbox needs. It runs on an ordinary Linux desktop.
-    /// See <c>Docs/testing.md</c> for why the sandbox is left on.
+    /// See <c>docs/testing.md</c> for why the sandbox is left on.
     ///
     /// The loads are local: <c>LoadHtml</c> and <c>LoadPlainText</c> take content
     /// directly, so nothing here touches the network. A test that fetched a page

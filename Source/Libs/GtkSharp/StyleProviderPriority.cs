@@ -16,7 +16,7 @@ namespace Gtk {
 	/// emits no constants at all -- so none of Gtk's 98 reach the api.xml, and
 	/// nothing generated declares these. Gdk's 2459 (the GDK_KEY_* keyvals) are
 	/// covered because someone hand-wrote Gdk.Key; these were simply missing, to
-	/// the point that the CSS example in Docs/getting-started.md named
+	/// the point that the CSS example in docs/getting-started.md named
 	/// Gtk.StyleProviderPriority.Application and did not compile.
 	///
 	/// Declared as constants rather than an enum because AddProvider takes a

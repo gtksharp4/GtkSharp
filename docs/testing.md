@@ -202,7 +202,7 @@ nothing.
 
 ### The sweep
 
-`Docs/`-adjacent tooling aside, the systematic form of this check is to compare
+`docs/`-adjacent tooling aside, the systematic form of this check is to compare
 every symbol the hand-written layer loads against the vendored `.gir` files:
 
 ```python
@@ -2907,7 +2907,7 @@ method can be resolved. `Gtk.IBuilderScope`, `Gtk.BuilderCScope` and
 failure is at least legible.
 
 **Where else to look:** a comment or a doc that describes an exception is a claim
-nobody checks. Grep `Docs/` for exception type names and confirm each one is
+nobody checks. Grep `docs/` for exception type names and confirm each one is
 reachable — this one had been wrong since the Gtk 4 port, in the file that
 teaches the binding.
 
@@ -3122,7 +3122,7 @@ distinguishable from the two that quietly do not.
 
 ## Behaviour worth knowing: how to read a widget's own painting back
 
-`DrawingAreaTests` covers the custom-drawing path — `Docs/getting-started.md`
+`DrawingAreaTests` covers the custom-drawing path — `docs/getting-started.md`
 devotes a section to it and the suite had no mention of `DrawingArea` or
 `SetDrawFunc` at all. It is the most common thing an application does beyond
 arranging widgets, and it crosses every boundary in the binding at once: a
@@ -4338,7 +4338,7 @@ broken, and none of them fails to compile.
 
 ## Behaviour worth knowing: JSC is testable where WebKit is not
 
-`Docs/coverage.md` reports 0 of 590 generated lines for `JavaScriptCoreSharp`,
+`docs/coverage.md` reports 0 of 590 generated lines for `JavaScriptCoreSharp`,
 and that is an artefact of the coverage run happening on Windows, where gvsbuild
 ships no jsc. It is not a statement about the tests.
 

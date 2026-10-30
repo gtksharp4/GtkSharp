@@ -13,7 +13,7 @@ namespace GtkSharp.Tests
     /// <remarks>
     /// <c>GtkSourceSharp</c> binds 102 types and the suite named eleven of them.
     /// Its hand-written layer is twelve lines, so the coverage table in
-    /// <c>Docs/coverage.md</c> says almost nothing about it — what matters is
+    /// <c>docs/coverage.md</c> says almost nothing about it — what matters is
     /// whether the generated surface actually works, and a generated wrapper for
     /// a missing or renamed export is a null delegate rather than a link error.
     ///

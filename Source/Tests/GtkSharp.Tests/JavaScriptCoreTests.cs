@@ -17,7 +17,7 @@ namespace GtkSharp.Tests
     ///
     /// It is not installed on Windows — gvsbuild ships no jsc — so these are
     /// <c>[SkippableFact]</c> and run on Linux. That is also why
-    /// <c>Docs/coverage.md</c> reports 0 of 590 generated lines for this
+    /// <c>docs/coverage.md</c> reports 0 of 590 generated lines for this
     /// assembly: the coverage run happens on Windows, where none of it can load.
     ///
     /// The oracle is arithmetic and text the test chose, computed by the engine

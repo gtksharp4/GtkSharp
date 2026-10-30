@@ -5,7 +5,7 @@ using Xunit;
 namespace GtkSharp.Tests
 {
     /// <summary>
-    /// The last two files `Docs/coverage.md` marks "worth testing":
+    /// The last two files `docs/coverage.md` marks "worth testing":
     /// <c>Gtk.ComboBoxText</c>'s protected constructor and
     /// <c>Pango.Analysis</c>'s hand-written accessors.
     /// </summary>

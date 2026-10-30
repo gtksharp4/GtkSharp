@@ -35,7 +35,7 @@ namespace GtkSharp.Tests
     /// user can drive them: presented, then cancelled through their
     /// <c>GCancellable</c>, which is the error path of every Finish method in
     /// the family. Nothing here launches a file or a URI —
-    /// <c>Docs/testing.md</c> records why the LinkButton sample is skipped, and
+    /// <c>docs/testing.md</c> records why the LinkButton sample is skipped, and
     /// a suite that opens the developer's browser is worse than one that does
     /// not run.
     /// </para>
@@ -1105,7 +1105,7 @@ namespace GtkSharp.Tests
         [Fact]
         public void A_uri_launcher_keeps_the_uri_it_was_built_with()
         {
-            // Deliberately not launched. Docs/testing.md records why the
+            // Deliberately not launched. docs/testing.md records why the
             // LinkButton sample is skipped: asking the desktop to open a URI
             // opens a browser on the machine running the suite.
             Run(() =>

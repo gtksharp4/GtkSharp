@@ -10,7 +10,7 @@ namespace GtkSharp.Tests
     /// </summary>
     /// <remarks>
     /// These two have nothing to do with each other except that they are the two
-    /// small hand-written files `Docs/coverage.md` marks "worth testing", and
+    /// small hand-written files `docs/coverage.md` marks "worth testing", and
     /// both have a real oracle rather than needing one invented.
     ///
     /// For <c>Image</c> it is a PNG the test makes itself, so the bytes going in

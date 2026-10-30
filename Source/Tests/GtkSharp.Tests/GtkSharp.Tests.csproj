@@ -36,7 +36,7 @@
     <PackageReference Include="xunit" Version="2.9.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
     <!-- Coverage is measured to find untested areas, never chased as a target;
-         see Docs/testing.md. -->
+         see docs/testing.md. -->
     <PackageReference Include="coverlet.collector" Version="6.0.2" />
     <!-- Lets a test skip at runtime with a reason. WebKit and JavaScriptCore
          are not present in every environment, and a test that silently returns

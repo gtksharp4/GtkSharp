@@ -2,7 +2,7 @@
 <interface>
   <requires lib="gtk" version="4.0"/>
   <!-- The window shell is described here rather than built in C#, to exercise
-       the Builder path Docs/getting-started.md documents.
+       the Builder path docs/getting-started.md documents.
 
        There is deliberately no <signal> element anywhere in this file. Gtk 4
        replaced gtk_builder_connect_signals_full with GtkBuilderScope, which

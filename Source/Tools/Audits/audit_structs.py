@@ -112,7 +112,7 @@ Known, and not regressions:
                         reports zero fields. The struct itself is correct.
   SourceFuncs           genuinely wrong, and deliberately left so: the members
   SourceCallbackFuncs   that would use them now throw rather than corrupting the
-                        main loop. See Docs/testing.md.
+                        main loop. See docs/testing.md.
 
 MarkupParser, PollFD and TimeVal matched on count and have since been read field
 by field against the C declaration. Two were right; TimeVal was not -- glong is

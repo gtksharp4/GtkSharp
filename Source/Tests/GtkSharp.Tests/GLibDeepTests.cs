@@ -167,7 +167,7 @@ namespace GtkSharp.Tests
             // Recorded rather than worked around. GLibSharp has no .metadata
             // file, so nothing generates methods for HookList and none were
             // written by hand: the type is its ABI description and nothing
-            // else. Like Gsk.RoundedRect (see Docs/testing.md), it is a boxed
+            // else. Like Gsk.RoundedRect (see docs/testing.md), it is a boxed
             // type with no allocator, so the inherited GLib.Opaque constructor
             // leaves the handle null and there is no way to get a usable one.
             // This test exists so that adding an operation forces a test too.

@@ -14,7 +14,7 @@ namespace GtkSharp.Tests
     /// </summary>
     /// <remarks>
     /// This is the workflow the templates generate and the one
-    /// <c>Docs/getting-started.md</c> teaches, and none of it was covered:
+    /// <c>docs/getting-started.md</c> teaches, and none of it was covered:
     /// <c>Builder.cs</c>, <c>BuilderXml.cs</c> and <c>BindingAttribute.cs</c> are
     /// entirely hand-written, so nothing about them is checked by compiling.
     ///
@@ -240,7 +240,7 @@ namespace GtkSharp.Tests
 
         // A .ui file that declares a handler cannot be loaded by this binding at
         // all -- not "loads with its signals unconnected", which is what
-        // Docs/getting-started.md used to promise and what Autoconnect's
+        // docs/getting-started.md used to promise and what Autoconnect's
         // NotSupportedException was written for. Gtk 4 resolves the handler while
         // *parsing*, through GtkBuilderScope; the default scope looks the name up
         // as an exported C symbol, does not find a managed method, and fails the

@@ -19,7 +19,7 @@ namespace GtkSharp.Tests
     /// Element pointers here are either fabricated *and* typed <c>IntPtr</c>, so
     /// nothing dereferences them, or real strings allocated for the test. Handing
     /// GLib an invented address in a context that reads through it crashes the
-    /// host rather than failing; see Docs/testing.md.
+    /// host rather than failing; see docs/testing.md.
     /// </remarks>
     public class GLibContainerTests : GtkTestBase
     {

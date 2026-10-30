@@ -83,7 +83,7 @@ namespace Gtk {
 		///
 		/// Here by hand for the same reason as
 		/// <see cref="StyleProviderPriority"/>: it is a <c>&lt;constant&gt;</c> in
-		/// Gtk-4.0.gir, and GirToGapi emits none of those. See Docs/testing.md.
+		/// Gtk-4.0.gir, and GirToGapi emits none of those. See docs/testing.md.
 		/// </remarks>
 		public const uint InvalidListPosition = uint.MaxValue;
 	}

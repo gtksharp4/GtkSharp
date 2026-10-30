@@ -53,7 +53,7 @@ namespace GtkSharp.Generation {
 	/// One thing this cannot separate: a hand-extended type's implicit class
 	/// constructor runs the static field initialisers from <em>both</em> halves,
 	/// and no attribute can attribute half a method. Those few lines per type
-	/// stay measured. See Docs/coverage.md.
+	/// stay measured. See docs/coverage.md.
 	/// </para>
 	/// </remarks>
 	public static class CoverageExclusion {

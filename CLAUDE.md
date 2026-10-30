@@ -52,7 +52,7 @@ Two kinds of test:
 
 `GtkFixture` owns the single thread Gtk is initialised on and marshals every test body onto it, because Gtk may only be used from the thread that called `gtk_init` and xunit promises no thread affinity. Parallelisation is disabled assembly-wide.
 
-**Why calling matters more than compiling here:** a native export that no longer exists is not a link error. `FuncLoader.LoadFunction` returns `default(T)`, so the binding compiles and throws `NullReferenceException` only when reached — with nothing naming the missing symbol. Whole families of removed Gtk 3 functions survived the port that way: `gtk_main`, `gtk_widget_destroy`, `gtk_button_new_from_stock`, `gtk_cell_renderer_get_size`. **Add a test that calls the thing you changed.**
+**Why calling matters more than compiling here:** a native export that no longer exists is not a link error. `FuncLoader.LoadFunction` binds it to a delegate that throws `NotSupportedException` naming the symbol (it used to be a null delegate and a nameless `NullReferenceException`), so the binding compiles and fails only when reached. Probe with `GLib.Global.IsSymbolAvailable(name)` or `Gtk.GtkVersion.AtLeast(major, minor)`. Whole families of removed Gtk 3 functions survived the port that way: `gtk_main`, `gtk_widget_destroy`, `gtk_button_new_from_stock`, `gtk_cell_renderer_get_size`. **Add a test that calls the thing you changed.**
 
 Interactive runs still exist: `--BuildTarget=RunSamples`.
 
@@ -99,7 +99,7 @@ Adding a new wrapper assembly means touching all of: `Settings.cake`, `Source/Gt
 
 Generated and hand-written code both follow the same pattern — a `[UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate d_<c_name>` plus a static field initialized via `FuncLoader.LoadFunction<…>(FuncLoader.GetProcAddress(GLibrary.Load(Library.X), "<c_name>"))`. Do not introduce plain `[DllImport("gtk-4-1.dll")]` calls; they break the cross-platform, glue-free design.
 
-**GDK and GSK are not separate shared libraries in Gtk 4** — both live inside `libgtk-4`, so `Library.Gdk`, `Library.Gsk` and `Library.Gtk` all resolve to the same file. A missing export yields a *null delegate*, because `FuncLoader.LoadFunction` returns `default(T)`; calling it throws `NullReferenceException` at the call site with nothing naming the missing symbol. When porting hand-written code, check that every symbol it loads still exists in `Source/Gir/*.gir`.
+**GDK and GSK are not separate shared libraries in Gtk 4** — both live inside `libgtk-4`, so `Library.Gdk`, `Library.Gsk` and `Library.Gtk` all resolve to the same file. A missing export yields a delegate that throws `NotSupportedException` naming the symbol when called (`FuncLoader.LoadFunction`); probe with `GLib.Global.IsSymbolAvailable` or `Gtk.GtkVersion.AtLeast`. When porting hand-written code, check that every symbol it loads still exists in `Source/Gir/*.gir`.
 
 Supporting a new native library requires adding the enum value plus its per-platform filename list in `GLibrary`'s static constructor.
 

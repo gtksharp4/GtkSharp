@@ -1,4 +1,5 @@
 using System;
+using System.Linq.Expressions;
 using System.Runtime.InteropServices;
 
 class FuncLoader
@@ -91,6 +92,13 @@ class FuncLoader
         return Unix.dlopen(libname, RTLD_GLOBAL | RTLD_LAZY);
     }
 
+    // The name of the last symbol GetProcAddress failed to resolve on this
+    // thread. Generated code is written LoadFunction<T>(GetProcAddress(lib, name)),
+    // so the name is out of LoadFunction's sight; this hands it across without
+    // changing a single generated call site.
+    [ThreadStatic]
+    private static string _lastMissingSymbol;
+
     public static IntPtr GetProcAddress(IntPtr library, string function)
     {
         var ret = IntPtr.Zero;
@@ -104,14 +112,76 @@ class FuncLoader
         else
             ret = Unix.dlsym(library, function);
 
+        _lastMissingSymbol = ret == IntPtr.Zero ? function : null;
+
         return ret;
     }
 
+    /// <summary>Whether <paramref name="symbol"/> is exported by <paramref name="library"/>.</summary>
+    public static bool IsAvailable(Library library, string symbol)
+    {
+        if (!GLibrary.IsSupported(library))
+            return false;
+
+        var found = GetProcAddress(GLibrary.Load(library), symbol) != IntPtr.Zero;
+        _lastMissingSymbol = null;
+
+        return found;
+    }
+
+    /// <summary>
+    /// Binds a native function pointer to a delegate.
+    /// </summary>
+    /// <remarks>
+    /// A symbol the loaded library does not export (a binding generated from Gtk
+    /// 4.22 running against 4.14, say) used to come back as a null delegate, so
+    /// the call compiled and then died with a NullReferenceException that named
+    /// nothing. It now comes back as a delegate of the same type that throws a
+    /// NotSupportedException naming the symbol, so the failure is attributable
+    /// and is raised where the call is made, not where the type initialises.
+    /// </remarks>
     public static T LoadFunction<T>(IntPtr procaddress)
     {
         if (procaddress == IntPtr.Zero)
-            return default(T);
+        {
+            var name = _lastMissingSymbol;
+            _lastMissingSymbol = null;
+
+            return CreateMissingSymbolThrower<T>(name);
+        }
 
         return Marshal.GetDelegateForFunctionPointer<T>(procaddress);
+    }
+
+    private static T CreateMissingSymbolThrower<T>(string symbol)
+    {
+        try
+        {
+            var invoke = typeof(T).GetMethod("Invoke");
+            if (invoke == null)
+                return default(T);
+
+            var parameters = invoke.GetParameters();
+            var arguments = new ParameterExpression[parameters.Length];
+            for (int i = 0; i < arguments.Length; i++)
+                arguments[i] = Expression.Parameter(parameters[i].ParameterType, parameters[i].Name);
+
+            var message = "The native function '" + (symbol ?? typeof(T).Name) + "' is not exported by the loaded library. "
+                + "The bindings are generated against Gtk 4.22, and the installed version is older than the release that added it; "
+                + "guard the call with Gtk.Global.CheckVersion or GLib.Global.IsSymbolAvailable.";
+
+            // System.Linq.Expressions rather than Reflection.Emit: it is in
+            // netstandard2.0 and builds a delegate of any signature, ref
+            // parameters included.
+            var body = Expression.Throw(
+                Expression.New(typeof(NotSupportedException).GetConstructor(new[] { typeof(string) }), Expression.Constant(message)),
+                invoke.ReturnType);
+
+            return Expression.Lambda<T>(body, arguments).Compile();
+        }
+        catch
+        {
+            return default(T);
+        }
     }
 }

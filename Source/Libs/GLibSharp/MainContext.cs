@@ -79,6 +79,20 @@ namespace GLib {
 			}
 		}
 		[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+		delegate bool d_g_main_context_is_owner(IntPtr raw);
+		static d_g_main_context_is_owner g_main_context_is_owner = FuncLoader.LoadFunction<d_g_main_context_is_owner>(FuncLoader.GetProcAddress(GLibrary.Load(Library.GLib), "g_main_context_is_owner"));
+
+		/// <summary>
+		/// Whether the calling thread currently owns this context, i.e. is inside
+		/// an iteration or dispatching one of its sources.
+		/// </summary>
+		public bool IsOwner {
+			get {
+				return g_main_context_is_owner (handle);
+			}
+		}
+
+		[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 		delegate void d_g_main_context_push_thread_default(IntPtr raw);
 		static d_g_main_context_push_thread_default g_main_context_push_thread_default = FuncLoader.LoadFunction<d_g_main_context_push_thread_default>(FuncLoader.GetProcAddress(GLibrary.Load(Library.GLib), "g_main_context_push_thread_default"));
 

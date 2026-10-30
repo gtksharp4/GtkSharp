@@ -186,9 +186,10 @@ Two consequences that have each cost real time:
 
 - **`Gdk`, `Gsk` and `Gtk` all resolve to the same file.** In Gtk 4 they are not
   separate shared libraries.
-- **A missing export is a null delegate, not an error.** `FuncLoader.LoadFunction`
-  returns `default(T)`, so the binding compiles and throws
-  `NullReferenceException` when reached, naming nothing. This is the single most
+- **A missing export throws when called, not when loaded.** `FuncLoader.LoadFunction`
+  binds it to a delegate that throws `NotSupportedException` naming the symbol (it
+  used to return `default(T)`, i.e. a nameless `NullReferenceException`). Probe with
+  `GLib.Global.IsSymbolAvailable` or `Gtk.GtkVersion.AtLeast`. This is the single most
   important thing about the codebase and is why the test suite exists.
   It also means **the library a symbol is looked up in must be the library that
   exports it** — `g_ptr_array_*` live in GLib, not GObject, and looking for them

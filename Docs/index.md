@@ -17,7 +17,6 @@
 | Document | Topic |
 |---|---|
 | [README.md](../README.md) | Project overview, branches, packages, build |
-| [CLAUDE.md](../CLAUDE.md) | Build, codegen pipeline and conventions for Claude Code |
 | [SampleApps/README.md](../SampleApps/README.md) | Standalone samples consuming GtkSharp as a NuGet package |
 | [Source/Samples/README.md](../Source/Samples/README.md) | In-repo samples app |
 | [Source/Gir/README.md](../Source/Gir/README.md) | Vendored `.gir` files: provenance and sha256 |

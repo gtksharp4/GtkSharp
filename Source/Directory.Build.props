@@ -26,7 +26,7 @@
 		     the utility generates, because that file is gitignored (*.nuget.props),
 		     is not a name MSBuild imports on its own, and ends by setting this
 		     property unconditionally to a different version. -->
-		<NuGetUtilityVersion>1.0.13</NuGetUtilityVersion>
+		<NuGetUtilityVersion>1.0.17</NuGetUtilityVersion>
 
 		<!-- The utility does not obfuscate these. They are bindings whose type and
 		     member names are the API, and it would only run on a Windows Release

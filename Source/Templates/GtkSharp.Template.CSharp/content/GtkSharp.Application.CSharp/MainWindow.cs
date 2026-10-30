@@ -30,7 +30,7 @@ namespace GtkNamespace
             a.RetVal = false;
         }
 
-        private void Button1_Clicked(object sender, EventArgs a)
+        private void Button1_Clicked(object sender, System.EventArgs a)
         {
             _counter++;
             _label1.Text = "Hello World! This button has been clicked " + _counter + " time(s).";

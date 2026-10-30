@@ -180,6 +180,9 @@
   <attr path="/api/namespace/object[@cname='GtkBuilder']/method[@name='ValueFromStringType']" name="hidden">1</attr>
   <attr path="/api/namespace/object[@cname='GtkButton']/constructor[@cname='gtk_button_new_with_label']" name="shared">true</attr>
   <attr path="/api/namespace/object[@cname='GtkButton']/signal[@name='Activate']" name="name">Activated</attr>
+  <!-- The "event" signal would generate Gtk.EventHandler / Gtk.EventArgs, which shadow
+       System.EventHandler / System.EventArgs in every file that says "using System; using Gtk;". -->
+  <attr path="/api/namespace/object[@cname='GtkEventControllerLegacy']/signal[@cname='event']" name="name">LegacyEvent</attr>
   <attr path="/api/namespace/object[@cname='GtkCellArea']/*[@name='Foreach']/*/*[@name='callback']" name="scope">call</attr>
   <attr path="/api/namespace/object[@cname='GtkCellArea']/*[@name='ForeachAlloc']/*/*[@name='callback']" name="scope">call</attr>
   <attr path="/api/namespace/object[@cname='GtkCellArea']/method[@name='GetFocusSiblings']/return-type" name="element_type">GtkCellRenderer*</attr>

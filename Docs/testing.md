@@ -167,8 +167,8 @@ This is the single most important thing to understand about testing this
 repository.
 
 GtkSharp binds native functions by **runtime symbol lookup**, not `DllImport` of
-a fixed name. `FuncLoader.LoadFunction` returns `default(T)` when an export is
-missing:
+a fixed name. `FuncLoader.LoadFunction` used to return `default(T)` when an export was
+missing; it now returns a delegate that throws `NotSupportedException` naming the symbol. The old behaviour:
 
 ```csharp
 public static T LoadFunction<T>(IntPtr procaddress)
@@ -1146,56 +1146,15 @@ would catch a regression builds fifty chains, drops them, forces a collection an
 then drains the main loop with a log handler installed — no single call
 reproduces it.
 
-## Open: a generated struct that is eight bytes shorter than the C one
+## Fixed: a generated struct that was eight bytes shorter than the C one
 
-`DeeperStackTests.A_rounded_rect_keeps_its_bounds` is `Skip`ped, and **the
-reason recorded here was wrong**. `Gsk.RoundedRect` is not a boxed type with a
-missing allocator; it is a generated `[StructLayout (Sequential)] struct`. What
-kills the process is that its layout is not `GskRoundedRect`'s:
-
-```c
-struct _GskRoundedRect {
-  graphene_rect_t bounds;      /* 16 bytes, embedded by value */
-  graphene_size_t corner[4];   /* 4 x 8 = 32 bytes            */
-};                             /* 48 bytes                    */
-```
-
-Both member types are bound as **classes** — `graphene_rect_t` and
-`graphene_size_t` are `<boxed opaque="true">` — so codegen emitted `bounds` as a
-single `IntPtr` and `corner` as a `ByValArray` of four object references.
-Measured:
-
-| | managed | C |
-|:--|--:|--:|
-| `sizeof` | 40 | 48 |
-| offset of `corner` | 8 | 16 |
-
-Every generated method then does
-`AllocHGlobal (Marshal.SizeOf<Gsk.RoundedRect> ())` and hands that pointer to a
-GSK function that reads and writes 48 bytes through it: an eight-byte heap
-overrun on **every** call, with `bounds` read back as an address assembled out of
-two floats. A default instance also has `Corner == null`, so there is nothing to
-marshal out in the first place.
-
-The fix is in `StructBase`: a field whose type is a boxed opaque with a known ABI
-size has to be embedded by value rather than referenced. Hiding the two fields
-instead is not enough, because `GenEqualsAndHash` skips hidden fields and would
-emit `Equals` as `return true`. Nothing else in the repository touches the type,
-so the damage is confined to whoever reaches for it first.
-
-`SatelliteAssemblyTests.The_rounded_rect_struct_holds_pointers_where_gsk_embeds_the_values`
-pins the mismatch against arithmetic over the C declaration, and is written to
-fail once the layout is corrected — so the person who fixes it is sent back to
-unskip `A_rounded_rect_keeps_its_bounds`.
-
-It asserts the **field types** rather than `Marshal.SizeOf`, because the runtime
-cannot be asked to measure this struct portably: .NET on Linux refuses outright
-("Type 'Gsk.RoundedRect' cannot be marshaled as an unmanaged structure" — a
-`ByValArray` of a class is not a layout the marshaller has), while on Windows it
-answers 40. Those are two reports of one defect, and the defect is upstream of
-both: a pointer field and an array-of-references field cannot describe sixteen
-embedded bytes followed by thirty-two more, whatever number a given runtime is
-willing to put on them.
+`Gsk.RoundedRect` is now the 48-byte, twelve-float `GskRoundedRect` (declared in
+`Source/Libs/GskSharp/RoundedRect.cs`, generated fields removed in `GskSharp.metadata`).
+`DeeperStackTests.A_rounded_rect_keeps_its_bounds` runs and
+`SatelliteAssemblyTests.The_rounded_rect_struct_lays_its_twelve_floats_out_the_way_gsk_reads_them`
+pins the layout. The original defect: bounds bound as an `IntPtr` and `corner` as a
+managed array gave 40 bytes (not marshallable on Linux), so every generated method
+overran the heap by eight bytes.
 
 ## Fixed: no managed widget could override OnActivate
 

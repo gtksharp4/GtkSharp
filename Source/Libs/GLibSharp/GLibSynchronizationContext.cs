@@ -29,15 +29,41 @@ using System.Threading;
 
 namespace GLib
 {
+	/// <summary>
+	/// A <see cref="SynchronizationContext"/> that marshals work onto the GLib
+	/// main loop, so an <c>await</c> started on the Gtk thread resumes there.
+	/// </summary>
 	public class GLibSynchronizationContext : SynchronizationContext
 	{
+		readonly int ownerThreadId = System.Threading.Thread.CurrentThread.ManagedThreadId;
+
+		/// <summary>Posts <paramref name="d"/> to the main loop as an idle source and returns at once.</summary>
 		public override void Post (SendOrPostCallback d, object state)
 		{
 			PostAction (() => d (state));
 		}
 
+		/// <summary>
+		/// Runs <paramref name="d"/> on the main loop and waits for it to finish.
+		/// </summary>
+		/// <remarks>
+		/// When the caller is already on the thread that owns the loop -- the
+		/// thread this context was created on, or whichever thread is currently
+		/// dispatching the default main context -- the delegate runs inline:
+		/// posting it and blocking would wait for an idle source that only the
+		/// blocked thread can run, which is a deadlock. Exceptions thrown by the
+		/// delegate propagate to the caller in both cases.
+		/// </remarks>
 		public override void Send (SendOrPostCallback d, object state)
 		{
+			if (d == null)
+				throw new ArgumentNullException ("d");
+
+			if (IsOnOwningThread ()) {
+				d (state);
+				return;
+			}
+
 			var mre = new ManualResetEvent (false);
 			Exception error = null;
 			
@@ -57,6 +83,14 @@ namespace GLib
 			if (error != null) {
 				throw error;
 			}
+		}
+
+		bool IsOnOwningThread ()
+		{
+			if (System.Threading.Thread.CurrentThread.ManagedThreadId == ownerThreadId)
+				return true;
+
+			return MainContext.Default.IsOwner;
 		}
 
 		void PostAction (Action action)

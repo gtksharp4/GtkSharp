@@ -44,6 +44,30 @@ namespace GLib {
 			}
 		}
 
+		/// <summary>
+		/// Whether a native function named <paramref name="symbol"/> is exported by
+		/// any of the libraries the bindings load (glib, gio, cairo, pango, graphene,
+		/// gtk, adwaita, ...).
+		/// </summary>
+		/// <remarks>
+		/// The bindings are generated against Gtk 4.22. Calling a function the
+		/// installed library lacks throws a <see cref="NotSupportedException"/>
+		/// naming it; probe first to take a fallback path instead. For a whole
+		/// release, <c>Gtk.GtkVersion.AtLeast</c> is the cheaper question.
+		/// </remarks>
+		public static bool IsSymbolAvailable (string symbol)
+		{
+			if (string.IsNullOrEmpty (symbol))
+				throw new ArgumentException ("A symbol name is required.", "symbol");
+
+			foreach (Library library in Enum.GetValues (typeof (Library))) {
+				if (FuncLoader.IsAvailable (library, symbol))
+					return true;
+			}
+
+			return false;
+		}
+
 		public static string ProgramName {
 			get {
 				return GLib.Marshaller.Utf8PtrToString (g_get_prgname());

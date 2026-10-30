@@ -412,5 +412,42 @@ namespace GtkSharp.Tests
                 Assert.Equal(1, treeDirection);
             });
         }
+
+        // ------------------------------------- "event" signals vs System.EventArgs
+
+        [Fact]
+        public void No_event_signal_generates_types_that_shadow_System_EventArgs()
+        {
+            // GtkEventControllerLegacy::event and GdkSurface::event generated
+            // Gtk/Gdk.EventHandler and Gtk/Gdk.EventArgs, so every file saying
+            // "using System; using Gtk;" got CS0104 on EventArgs and EventHandler.
+            // This file is such a file: the unqualified names below only compile
+            // while nothing in Gtk shadows them.
+            EventHandler handler = (o, args) => { };
+            EventArgs empty = EventArgs.Empty;
+            handler(this, empty);
+
+            Assert.Null(typeof(Widget).Assembly.GetType("Gtk.EventArgs"));
+            Assert.Null(typeof(Widget).Assembly.GetType("Gtk.EventHandler"));
+            Assert.Null(typeof(Gdk.Surface).Assembly.GetType("Gdk.EventArgs"));
+            Assert.Null(typeof(Gdk.Surface).Assembly.GetType("Gdk.EventHandler"));
+        }
+
+        [Fact]
+        public void The_renamed_event_signals_still_connect_to_their_native_signal()
+        {
+            Run(() =>
+            {
+                // Only the managed names changed; the cname is still "event".
+                var legacy = new EventControllerLegacy();
+                LegacyEventHandler handler = (o, args) => { args.RetVal = false; };
+                legacy.LegacyEvent += handler;
+                legacy.LegacyEvent -= handler;
+
+                Assert.NotNull(typeof(LegacyEventArgs).GetProperty("Event"));
+                Assert.NotNull(typeof(Gdk.Surface).GetEvent("SurfaceEvent"));
+                Assert.NotNull(typeof(Gdk.SurfaceEventArgs).GetProperty("Event"));
+            });
+        }
     }
 }

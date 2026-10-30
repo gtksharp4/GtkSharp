@@ -208,6 +208,85 @@ namespace GtkSharp.Tests
             });
         }
 
+        [Fact]
+        public void Send_on_the_gtk_thread_runs_inline_instead_of_deadlocking()
+        {
+            // Send used to post an idle source and block on it. From the thread
+            // that runs the loop nothing can ever run that source: a deadlock.
+            Run(() =>
+            {
+                var context = SynchronizationContext.Current;
+                int gtkThread = ThreadId;
+                int ranOn = -1;
+                bool ran = false;
+
+                context.Send(_ => { ranOn = ThreadId; ran = true; }, null);
+
+                Assert.True(ran, "the callback should have run before Send returned");
+                Assert.Equal(gtkThread, ranOn);
+            });
+        }
+
+        [Fact]
+        public void Send_on_the_gtk_thread_propagates_the_original_exception()
+        {
+            Run(() =>
+            {
+                var context = SynchronizationContext.Current;
+
+                var error = Assert.Throws<InvalidOperationException>(
+                    () => context.Send(_ => throw new InvalidOperationException("inline"), null));
+
+                Assert.Equal("inline", error.Message);
+            });
+        }
+
+        [Fact]
+        public void Send_from_inside_a_dispatched_source_runs_inline_even_for_a_context_made_elsewhere()
+        {
+            // A context created on a worker thread does not know the Gtk thread
+            // by identity; it has to ask GLib who owns the default main context.
+            Run(() =>
+            {
+                SynchronizationContext foreign = null;
+                var maker = new Thread(() => foreign = new GLib.GLibSynchronizationContext());
+                maker.Start();
+                maker.Join();
+
+                int gtkThread = ThreadId;
+                int ranOn = -1;
+                bool ownerInsideDispatch = false;
+                bool dispatched = false;
+
+                GLib.Idle.Add(() =>
+                {
+                    ownerInsideDispatch = GLib.MainContext.Default.IsOwner;
+                    foreign.Send(_ => ranOn = ThreadId, null);
+                    dispatched = true;
+                    return false;
+                });
+
+                Assert.True(PumpUntil(() => dispatched), "the idle source should have run without hanging");
+
+                Assert.True(ownerInsideDispatch, "dispatching a source makes the thread the owner");
+                Assert.Equal(gtkThread, ranOn);
+            });
+        }
+
+        [Fact]
+        public void A_thread_that_is_not_dispatching_does_not_own_the_main_context()
+        {
+            Run(() =>
+            {
+                bool owner = true;
+                var worker = new Thread(() => owner = GLib.MainContext.Default.IsOwner);
+                worker.Start();
+                worker.Join();
+
+                Assert.False(owner);
+            });
+        }
+
         // ------------------------------------------------------------- await
 
         [Fact]

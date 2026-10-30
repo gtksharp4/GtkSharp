@@ -31,8 +31,7 @@ namespace GtkSharp.Tests
         /// test merely because it fails somewhere.
         /// </remarks>
         public static bool GtkAtLeast(uint major, uint minor)
-            => Gtk.Global.MajorVersion > major
-               || (Gtk.Global.MajorVersion == major && Gtk.Global.MinorVersion >= minor);
+            => Gtk.GtkVersion.AtLeast(major, minor);
 
         /// <summary>A skip reason naming the symbol and the Gtk that lacks it.</summary>
         public static string NeedsGtk(uint major, uint minor, string symbol)

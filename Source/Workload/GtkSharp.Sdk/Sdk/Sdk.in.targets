@@ -3,7 +3,7 @@
   <!-- GtkSharp target from the original nuget package -->
   <Import Project="..\targets\GtkSharp.targets" />
 
-  <!-- Register net8.0-gtk3.24 TFM -->
+  <!-- Register the net@GTKSHARPNETVERSION@-gtk@GTKSHARPVERSION@ TFM -->
   <ItemGroup>
     <SupportedPlatform Include="gtk" />
   </ItemGroup>
@@ -29,9 +29,9 @@
       RuntimeFrameworkName="GtkSharp"
       DefaultRuntimeFrameworkVersion="**FromWorkload**"
       LatestRuntimeFrameworkVersion="**FromWorkload**"
-      TargetingPackName="GtkSharp.Ref"
+      TargetingPackName="GtkSharp4.Ref"
       TargetingPackVersion="**FromWorkload**"
-      RuntimePackNamePatterns="GtkSharp.Runtime"
+      RuntimePackNamePatterns="GtkSharp4.Runtime"
       RuntimePackRuntimeIdentifiers="win-x64;win-x86;linux-x64;linux-x86;osx-x64"
       Profile="GTK"
     />
@@ -54,8 +54,8 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <!-- Must be self-contained. Framework-dependent builds cannot see our custom runtime -->
-    <SelfContained>true</SelfContained>
+    <!-- Self-contained by default, because framework-dependent builds cannot see our custom runtime. Only a default: a project that sets SelfContained itself keeps its value. -->
+    <SelfContained Condition=" '$(SelfContained)' == '' ">true</SelfContained>
     <RuntimeIdentifier Condition=" '$(RuntimeIdentifier)' == '' and $([MSBuild]::IsOsPlatform('Windows')) and '$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' == 'X64' ">win-x64</RuntimeIdentifier>
     <RuntimeIdentifier Condition=" '$(RuntimeIdentifier)' == '' and $([MSBuild]::IsOsPlatform('Windows')) and '$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' == 'X86' ">win-x86</RuntimeIdentifier>
     <RuntimeIdentifier Condition=" '$(RuntimeIdentifier)' == '' and $([MSBuild]::IsOsPlatform('Linux')) and '$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' == 'X64' ">linux-x64</RuntimeIdentifier>

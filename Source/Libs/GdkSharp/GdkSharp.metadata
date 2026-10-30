@@ -148,5 +148,7 @@
        GdkToplevelSize, which is a different struct. The toplevel is the one
        applications use, so the drag surface moves; the cname is unchanged. -->
   <attr path="/api/namespace/interface[@cname='GdkDragSurface']/signal[@cname='compute-size']" name="name">ComputeDragSurfaceSize</attr>
+  <!-- As GtkEventControllerLegacy::event: a signal named "event" generates Gdk.EventHandler /
+       Gdk.EventArgs, shadowing System.EventHandler / System.EventArgs for "using Gdk;" code. -->
+  <attr path="/api/namespace/object[@cname='GdkSurface']/signal[@cname='event']" name="name">SurfaceEvent</attr>
 </metadata>
-

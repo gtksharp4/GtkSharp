@@ -263,9 +263,14 @@ var templateLanguages = new List<string>()
     "VBNet"
 };
 
-Task("InstallWorkload")
-    .IsDependentOn("PackageWorkload")
-    .IsDependentOn("PackageTemplates")
+// Installs the packages already in BuildOutput/NugetPackages, without building or packing.
+// Split out so the install can run with DOTNET_ROOT pointing at a private SDK
+// while the build runs under the default one: DOTNET_ROOT also steers apphosts
+// such as NuGetUtility.exe, which need a .NET 8 runtime a fresh SDK does not carry.
+//   dotnet cake build.cake --BuildTarget=Default
+//   DOTNET_ROOT=<private sdk> dotnet cake build.cake --BuildTarget=InstallPackedWorkload
+Task("InstallPackedWorkload")
+    .IsDependentOn("Init")
     .Does(() =>
 {
     Console.WriteLine($"Installing workload for SDK version {TargetEnvironment.DotNetCliFeatureBand}, at {TargetEnvironment.DotNetInstallPath}");
@@ -290,6 +295,11 @@ Task("InstallWorkload")
     Console.WriteLine($"Registering \"gtk\" installed workload...");
     TargetEnvironment.RegisterInstalledWorkload("gtk");
 });
+
+Task("InstallWorkload")
+    .IsDependentOn("PackageWorkload")
+    .IsDependentOn("PackageTemplates")
+    .IsDependentOn("InstallPackedWorkload");
 
 Task("UninstallWorkload")
     .Does(() =>

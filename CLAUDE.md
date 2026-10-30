@@ -31,7 +31,7 @@ dotnet cake build.cake --Configuration=Debug
 dotnet cake build.cake --BuildVersion=4.22.4.1
 ```
 
-Workload targets (`InstallWorkload` / `UninstallWorkload`) install the `gtk` workload into the local .NET SDK directory — they mutate the machine's SDK install, so don't run them casually.
+Workload targets (`InstallWorkload` / `UninstallWorkload`) install the `gtk` workload into the local .NET SDK directory — they mutate the machine's SDK install, so don't run them casually. `InstallPackedWorkload` installs already packed packages and, with `DOTNET_ROOT` pointing at a private SDK, leaves the machine SDK alone; recipe and smoke test in `Docs/workload-install.md`.
 
 All build output lands in `BuildOutput/` (`BuildOutput/Tools`, `BuildOutput/$(Configuration)`, `BuildOutput/NugetPackages`).
 

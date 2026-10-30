@@ -1295,8 +1295,7 @@ the gap is invisible until something calls. Guarding the registration is the
 difference between "one class from a newer release is unavailable" and "this
 assembly does not work."
 
-Remaining gates: 10 (`dotnet new gtkapp` end-to-end), 11 (workload install), and
-CI, which still has not been observed running.
+Remaining gates: CI, which still has not been observed running. Gates 10 and 11 (`dotnet new` end to end, workload install) were closed with a private SDK, see `workload-install.md`.
 
 ---
 

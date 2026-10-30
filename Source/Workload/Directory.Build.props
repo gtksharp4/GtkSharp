@@ -10,7 +10,7 @@
     <_GtkSharpVersion>$(_GtkSharpPlatformVersion)</_GtkSharpVersion>
     <_GtkSharpTfm>net$(_GtkSharpNetVersion)-gtk</_GtkSharpTfm>
     <_GtkSharpFullTfm>net$(_GtkSharpNetVersion)-gtk$(_GtkSharpVersion)</_GtkSharpFullTfm>
-    <_GtkSharpManifestVersionBand Condition=" '$(_GtkSharpManifestVersionBand)' == '' ">8.0.200</_GtkSharpManifestVersionBand>
+    <_GtkSharpManifestVersionBand Condition=" '$(_GtkSharpManifestVersionBand)' == '' ">$(_GtkSharpNetVersion).100</_GtkSharpManifestVersionBand>
     <!-- Folder format somewhat similar to packs in .NET, making stuff easier to install -->
     <OutputPath>$(_GtkSharpBuildOutputDirectory)WorkloadPacks\$(Configuration)\$(MSBuildProjectName)\$(Version)</OutputPath>
   </PropertyGroup>

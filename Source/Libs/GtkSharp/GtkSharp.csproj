@@ -39,7 +39,11 @@
         </ProjectReference>
     </ItemGroup>
     <ItemGroup>
-        <Content Include="GtkSharp.targets" PackagePath="build\GtkSharp.targets" />
+        <!-- NuGet only auto-imports build/[PackageId].targets, and the PackageId is
+             GtkSharp4 (see Libs/Directory.Build.props), not GtkSharp. buildTransitive
+             carries the same file to consumers of a package that references GtkSharp4;
+             the target is idempotent, so a direct consumer getting both is harmless. -->
+        <Content Include="GtkSharp.targets" PackagePath="build\$(PackageId).targets;buildTransitive\$(PackageId).targets" />
     </ItemGroup>
     <!-- Build-time only: PrivateAssets keeps it out of the produced package. The
        condition is on the build host, so packages published by CI (which packs

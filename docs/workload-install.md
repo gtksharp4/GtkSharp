@@ -1,6 +1,6 @@
 # Installing the `gtk` workload (private SDK recipe)
 
-Proves `net10.0-gtk4.22` end to end (gates 10 and 11 of `gtk4-upgrade-plan.md`) without touching the
+Proves `net10.0-gtk4.22` end to end without touching the
 machine-wide SDK.
 
 ## Recipe (Windows, PowerShell)

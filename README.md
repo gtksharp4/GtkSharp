@@ -9,7 +9,7 @@ Documentation: https://gtksharp4.github.io/GtkSharp/ (source: [docs/index.md](do
 | Branch    | Gtk version | Package version line | Status                                                     |
 |:----------|:------------|:---------------------|:-----------------------------------------------------------|
 | `develop` | Gtk 3.24    | `3.24.24.x`          | Gtk 3 maintenance line.                                     |
-| `gtk4`    | Gtk 4.22.4  | `4.22.4.x`           | Gtk 4 upgrade, in progress — see [docs/gtk4-upgrade-plan.md](docs/gtk4-upgrade-plan.md). |
+| `gtk4`    | Gtk 4.22.4  | `4.22.4.x`           | Gtk 4 upgrade, in progress |
 | `net4x.gtk4` | Gtk 4.22.4 | `4.22.4.x`         | `gtk4` plus `Sharp4` package ids and Net4x.NuGetUtility packaging; the line the [NuGet packages](#nuget-packages) below come from. |
 
 The Gtk 4 line is a hard break: same assembly names and namespaces, no side-by-side install with the 3.24.x packages.

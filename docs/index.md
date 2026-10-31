@@ -55,7 +55,3 @@
 | [GtkSharp4.Workload.Template.CSharp](https://github.com/gtksharp4/GtkSharp/blob/develop/Source/Workload/GtkSharp.Workload.Template.CSharp/README.md) | C# templates |
 | [GtkSharp4.Workload.Template.FSharp](https://github.com/gtksharp4/GtkSharp/blob/develop/Source/Workload/GtkSharp.Workload.Template.FSharp/README.md) | F# templates |
 | [GtkSharp4.Workload.Template.VBNet](https://github.com/gtksharp4/GtkSharp/blob/develop/Source/Workload/GtkSharp.Workload.Template.VBNet/README.md) | VB templates |
-
-## Legacy (not built)
-
-- [Source/OldStuff/sources/Generating-Sources.md](https://github.com/gtksharp4/GtkSharp/blob/develop/Source/OldStuff/sources/Generating-Sources.md) — mono-era source generation notes

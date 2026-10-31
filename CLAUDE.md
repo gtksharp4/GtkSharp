@@ -109,7 +109,6 @@ Supporting a new native library requires adding the enum value plus its per-plat
 - `Source/Workload/` — the .NET `gtk` workload: `GtkSharp.Ref`, `GtkSharp.Runtime`, `GtkSharp.Sdk`, and `GtkSharp.NET.Sdk.Gtk` (the workload manifest, packed once per SDK feature band listed in `supportedVersionBands` in `build.cake`), plus workload-flavoured C#/F#/VB templates.
 - `Source/Templates/` — the standalone `dotnet new gtkapp` template packages (C#/F#/VB), independent of the workload.
 - `Source/Addins/MonoDevelop.GtkSharp.Addin` — restored by `Prepare` but not part of the main build/pack targets.
-- `Source/OldStuff/` — legacy mono/gtk-sharp material (docs, old parser, gtkdotnet). Not built; treat as reference only.
 
 ## Build conventions
 

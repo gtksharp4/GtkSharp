@@ -5,7 +5,7 @@
     <PackageIcon>Icon.png</PackageIcon>
     <Authors>GtkSharp Contributors</Authors>
     <PackageProjectUrl>https://gtksharp4.github.io/GtkSharp/</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/pieroviano/GtkSharp</RepositoryUrl>
+    <RepositoryUrl>https://github.com/gtksharp4/GtkSharp</RepositoryUrl>
     <OutputPath>..\..\..\BuildOutput\$(Configuration)</OutputPath>
     <IncludeContentInPack>true</IncludeContentInPack>
     <IncludeBuildOutput>false</IncludeBuildOutput>

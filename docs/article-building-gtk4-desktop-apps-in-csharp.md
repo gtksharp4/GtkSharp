@@ -3,13 +3,12 @@
 Cross-platform desktop UI in .NET usually means picking between Avalonia, MAUI, or
 staying on Windows with WPF. There is a fourth option that gets less attention:
 **GTK 4**, the toolkit behind GNOME, bound to C# by
-[GtkSharp](https://github.com/pieroviano/GtkSharp/tree/net4x.gtk4). One codebase
+[GtkSharp](https://github.com/gtksharp4/GtkSharp). One codebase
 runs natively on Linux, Windows and macOS, and — unlike most desktop stacks — you
 are calling the same C library that shipped with the operating system.
 
-The code in this article targets the GTK 4.22 binding on the
-[`net4x.gtk4`](https://github.com/pieroviano/GtkSharp/tree/net4x.gtk4) branch,
-which is what the `4` packages suffix below are built from.
+The code in this article targets the GTK 4.22 binding, published as the
+`GtkSharp4` family of packages (`GtkSharp4`, `GLibSharp4`, …).
 
 This article walks through building a GTK 4 application in C#: the first window,
 layout, signals, UI files, input, actions, lists, custom drawing and CSS. It also
@@ -406,12 +405,12 @@ The GTK runtime is **not** included — your users need it installed, or you shi
 alongside. On Windows, the gvsbuild tree downloaded at build time is what you would
 redistribute.
 
-There is also a .NET workload — `GtkSharp4.Ref`, `GtkSharp4.Runtime` and
-`GtkSharp4.Sdk`, published through the `GtkSharp4.NET.Sdk.Gtk` manifest —
-if you prefer
+There is also a .NET workload, `gtk` (`GtkSharp4.Sdk`, `GtkSharp4.Ref` and
+`GtkSharp4.Runtime`, published through the `GtkSharp4.NET.Sdk.Gtk.Manifest-<band>`
+manifest), if you prefer a target framework
 
 ```xml
-<Project Sdk="GtkSharp4.NET.Sdk.Gtk">
+<TargetFramework>net10.0-gtk4.22</TargetFramework>
 ```
 
 to a `PackageReference`. Installing it mutates your SDK directory, so prefer the
@@ -460,8 +459,6 @@ to see a widget working before you commit to it — it has a section per widget 
 is the widest worked example available.
 
 The source, the sample browser and the test suite are at
-[github.com/pieroviano/GtkSharp](https://github.com/pieroviano/GtkSharp), on the
-`net4x.gtk4` branch. The `develop` branch is the same work prepared as a pull
-request against the upstream
-[GtkSharp/GtkSharp](https://github.com/GtkSharp/GtkSharp) project, so if the GTK 4
-binding lands upstream, that is where it will arrive.
+[github.com/gtksharp4/GtkSharp](https://github.com/gtksharp4/GtkSharp), on the
+`develop` branch, with the documentation at
+[gtksharp4.github.io/GtkSharp](https://gtksharp4.github.io/GtkSharp/).

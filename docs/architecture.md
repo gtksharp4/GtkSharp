@@ -320,7 +320,16 @@ you go looking for the metadata rule that does not exist:
   directory is shared with everything else built for the same framework — the
   template projects land there too.
 - `Source/Templates/` — standalone `dotnet new gtkapp` templates, independent of
-  the workload.
+  the workload. The workload's own templates call the application template
+  `gtk`.
+- **Package ids carry a `4`** so they never collide with the Gtk 3 packages;
+  assembly names and namespaces do not. Wrappers and packs derive it from the
+  project name (`Source/Libs/Directory.Build.props`,
+  `Source/Workload/Shared/Common.targets`: `GtkSharp` → `GtkSharp4`,
+  `GtkSharp.Ref` → `GtkSharp4.Ref`), workload templates in
+  `Source/Workload/Shared/Templates.targets`, standalone templates set
+  `GtkSharp4.Template.*` explicitly, and the manifest is
+  `GtkSharp4.NET.Sdk.Gtk.Manifest-<band>`.
 - `Source/Libs/GtkSharp/GtkSharp.targets` — ships inside the NuGet package and, on
   Windows, downloads and unzips a gvsbuild Gtk 4 runtime into
   `%LOCALAPPDATA%\Gtk\4.22.4` unless `SkipGtkInstall=True`. The bundle is a full

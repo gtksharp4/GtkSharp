@@ -1,7 +1,7 @@
 # GtkSharp4.Workload.Template.FSharp
 
 F# templates for Gtk 4 applications, built on
-[GtkSharp](https://github.com/pieroviano/GtkSharp).
+[GtkSharp](https://github.com/gtksharp4/GtkSharp).
 
 ## Installed with the workload
 
@@ -10,7 +10,7 @@ being installed on their own:
 
 ```sh
 dotnet workload install gtk
-dotnet new gtkapp -o HelloGtk
+dotnet new gtk -o HelloGtk
 ```
 
 ## Templates
@@ -34,4 +34,4 @@ application template is `gtk` here, where the standalone
 ## Licence
 
 GNU Library General Public License v2. Sources and the full licence text
-are in the [repository](https://github.com/pieroviano/GtkSharp).
+are in the [repository](https://github.com/gtksharp4/GtkSharp).

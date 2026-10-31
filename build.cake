@@ -72,7 +72,7 @@ Task("Init")
     // Assign some common properties
     msbuildsettings = msbuildsettings.WithProperty("Version", Settings.Version);
     msbuildsettings = msbuildsettings.WithProperty("Authors", "'GtkSharp Contributors'");
-    msbuildsettings = msbuildsettings.WithProperty("PackageLicenseUrl", "'https://github.com/pieroviano/GtkSharp/blob/cakecore/LICENSE'");
+    msbuildsettings = msbuildsettings.WithProperty("PackageLicenseUrl", "'https://github.com/gtksharp4/GtkSharp/blob/develop/LICENSE'");
 
     // Add stuff to list
     Settings.Init();

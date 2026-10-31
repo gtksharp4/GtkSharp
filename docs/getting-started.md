@@ -50,7 +50,7 @@ use of them with `WebKit.Global.IsSupported`.
 ## The fastest start
 
 ```sh
-dotnet new install GtkSharp.Template.CSharp
+dotnet new install GtkSharp4.Template.CSharp
 dotnet new gtkapp -o HelloGtk
 cd HelloGtk
 dotnet run
@@ -585,8 +585,9 @@ The Gtk runtime is **not** included: your users need it installed, or you ship i
 alongside. On Windows the gvsbuild tree that `GtkSharp.targets` downloads is what
 you would redistribute.
 
-There is also a .NET workload (`GtkSharp.Ref`, `GtkSharp.Runtime`, `GtkSharp.Sdk`)
-if you prefer `<Project Sdk="GtkSharp.NET.Sdk.Gtk">` to a `PackageReference`.
+There is also a .NET workload, `gtk` (`GtkSharp4.Sdk`, `GtkSharp4.Ref`,
+`GtkSharp4.Runtime`), if you prefer `<TargetFramework>net10.0-gtk4.22</TargetFramework>`
+to a `PackageReference`; its application template is `dotnet new gtk`.
 Installing it mutates your SDK directory, so prefer the package unless you need
 the SDK integration.
 

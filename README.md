@@ -1,6 +1,6 @@
 # GtkSharp
 
-GtkSharp is a C# wrapper for Gtk and its related components. The component list includes the following libraries: glib, gio, cairo, pango, graphene, gdk, gsk. This is a fork of https://github.com/mono/gtk-sharp and is maintained completely separately from that project.
+GtkSharp is a C# wrapper for Gtk 4.22 and its related components: glib, gio, cairo, pango, graphene, gdk, gsk, libadwaita, gtksourceview, webkitgtk and javascriptcore. It is a fork of https://github.com/mono/gtk-sharp, maintained completely separately from that project, and comes from the Gtk 4 work on [pieroviano/GtkSharp](https://github.com/pieroviano/GtkSharp).
 
 Documentation: https://gtksharp4.github.io/GtkSharp/ (source: [docs/index.md](docs/index.md)).
 
@@ -8,17 +8,15 @@ Documentation: https://gtksharp4.github.io/GtkSharp/ (source: [docs/index.md](do
 
 | Branch    | Gtk version | Package version line | Status                                                     |
 |:----------|:------------|:---------------------|:-----------------------------------------------------------|
-| `develop` | Gtk 3.24    | `3.24.24.x`          | Gtk 3 maintenance line.                                     |
-| `gtk4`    | Gtk 4.22.4  | `4.22.4.x`           | Gtk 4 upgrade, in progress |
-| `net4x.gtk4` | Gtk 4.22.4 | `4.22.4.x`         | `gtk4` plus `Sharp4` package ids and Net4x.NuGetUtility packaging; the line the [NuGet packages](#nuget-packages) below come from. |
+| `develop` | Gtk 4.22.4  | `4.22.4.x`           | `Sharp4` package ids, Net4x.NuGetUtility packaging; the line the [NuGet packages](#nuget-packages) below come from. |
 
-The Gtk 4 line is a hard break: same assembly names and namespaces, no side-by-side install with the 3.24.x packages.
+The Gtk 4 line is a hard break: same assembly names and namespaces, no side-by-side install with the Gtk 3 `3.24.x` packages.
 
 Differences can be seen with the following table:
 
 |               | Target framework   | Target Gtk Version                                 | Extra notes                   |
 |:--------------|:-------------------|:---------------------------------------------------|:------------------------------|
-| GtkSharp      | .NET Standard 2.0  | Gtk 4.22 (`gtk4` branch), Gtk 3.22 (`develop`)      | Does not need glue libraries. |
+| GtkSharp      | .NET Standard 2.0  | Gtk 4.22                                           | Does not need glue libraries. |
 | mono/gtksharp | .NET Framework 4.5 | Gtk 2 (also Gtk 3.0 but never officially released) |                               |
 
 * [Building from source](#building-from-source)
@@ -32,7 +30,7 @@ Pre requirements for building from source are that you have .NET 10 installed on
 To build the repository, simply do:
 
 ```sh
-git clone https://github.com/pieroviano/GtkSharp.git
+git clone https://github.com/gtksharp4/GtkSharp.git
 cd GtkSharp
 dotnet tool restore
 dotnet cake build.cake
@@ -43,11 +41,13 @@ A breakdown on how the source is structured:
 * Tools that are needed to generate wrapper code are found in [Tools](Source/Tools) folder
 * The actual wrappers code is found in [Libs](Source/Libs) folder
 * Templates are located in [Templates](Source/Templates) folder
+* The .NET `gtk` workload (packs, manifest, workload templates) is in [Workload](Source/Workload) folder
+* Tests are in [Tests](Source/Tests) folder; samples in [Samples](Source/Samples) and [SampleApps](SampleApps)
 * Build script is separated between [build.cake](build.cake) and [CakeScripts](CakeScripts) folder
 
 ## Using the library
 
-On macOS, you'll need to manually install Gtk, see [Installing Gtk on Mac](https://github.com/pieroviano/GtkSharp/wiki/Installing-Gtk-on-Mac) wiki page for more details on how to do it.
+A Gtk 4 runtime must be present at run time. On Windows `GtkSharp4` downloads one on first build; on Linux and macOS install it yourself (`apt install libgtk-4-1`, `brew install gtk4`, …) — see [What you need](docs/getting-started.md#what-you-need).
 
 ### NuGet packages
 

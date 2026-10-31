@@ -432,7 +432,8 @@ resolves native functions at runtime, so a call that no longer exists is a
 
 ## Checklist
 
-1. Update `PackageReference` to `GtkSharp` 4.22.x; install a Gtk 4 runtime.
+1. Replace the `GtkSharp` 3.x `PackageReference` with `GtkSharp4` 4.22.x (assembly
+   and namespaces keep their names); install a Gtk 4 runtime.
 2. Run the grep above; note the file list.
 3. `Application.Init()` niladic; `DeleteEvent` → `CloseRequest` (invert the
    `RetVal`); drop `ShowAll`.

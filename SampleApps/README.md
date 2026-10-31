@@ -36,19 +36,14 @@ downloads a gvsbuild bundle into `%LOCALAPPDATA%\Gtk\4.22.4` on first build
 (`-p:SkipGtkInstall=True` opts out); elsewhere install `libgtk-4-1` / `gtk4`
 from your distribution.
 
-## The package-id prefix
+## Package ids
 
-This branch packs the package ids unprefixed (`GtkSharp4`, `GLibSharp4`, …). The
-`net4x.gtk4` branch publishes the same packages with a `4` suffix on the
-feed id. **Only the id differs** — the assemblies inside are `GtkSharp.dll`,
-`GLibSharp.dll` and so on, and the namespaces are unprefixed, so not a line of
-sample code changes between the two.
+The projects reference the `4`-suffixed ids (`GtkSharp4`, `GLibSharp4`, …) at
+`$(GtkSharpVersion)` (`4.22.4.*`). **Only the id carries the suffix** — the
+assemblies inside are `GtkSharp.dll`, `GLibSharp.dll` and so on, and the
+namespaces are unprefixed.
 
-The projects here reference `$(GtkSharpPackagePrefix)GtkSharp`, with the
-property empty by default. To build against the prefixed packages:
-
-```sh
-dotnet build GettingStarted.slnx
-```
-
-Set `$(GtkSharpVersion)` in the `.csproj` to move to another release.
+| Property | Default | Effect |
+|:--|:--|:--|
+| `GtkSharpVersion` | `4.22.4.*` | Package version to restore |
+| `GtkSharpPackagePrefix` | empty | Prepended to every id, for a feed that publishes them under a prefix |

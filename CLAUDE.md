@@ -106,8 +106,10 @@ Supporting a new native library requires adding the enum value plus its per-plat
 ## Project layout beyond the wrappers
 
 - `Source/Tools/` — `GapiFixup` and `GapiCodegen` (built first by the `Prepare` task into `BuildOutput/Tools`).
-- `Source/Workload/` — the .NET `gtk` workload: `GtkSharp.Ref`, `GtkSharp.Runtime`, `GtkSharp.Sdk`, and `GtkSharp.NET.Sdk.Gtk` (the workload manifest, packed once per SDK feature band listed in `supportedVersionBands` in `build.cake`), plus workload-flavoured C#/F#/VB templates.
+- `Source/Workload/` — the .NET `gtk` workload: `GtkSharp.Ref`, `GtkSharp.Runtime`, `GtkSharp.Sdk`, and `GtkSharp.NET.Sdk.Gtk` (the workload manifest, packed once per SDK feature band listed in `supportedVersionBands` in `build.cake`), plus workload-flavoured C#/F#/VB templates (application template short name `gtk`).
 - `Source/Templates/` — the standalone `dotnet new gtkapp` template packages (C#/F#/VB), independent of the workload.
+
+**Package ids differ from project and assembly names: they carry a `4`** (`GtkSharp4`, `GLibSharp4`, `GtkSharp4.Ref`, `GtkSharp4.Template.CSharp`, `GtkSharp4.NET.Sdk.Gtk.Manifest-<band>`), so they never collide with the Gtk 3 packages. Derived from the project name in `Source/Libs/Directory.Build.props`, `Source/Workload/Shared/Common.targets` and `Templates.targets`; set explicitly in the standalone template `.csproj` files. Assemblies and namespaces are unchanged (`GtkSharp.dll`, `namespace Gtk`).
 - `Source/Addins/MonoDevelop.GtkSharp.Addin` — restored by `Prepare` but not part of the main build/pack targets.
 
 ## Build conventions

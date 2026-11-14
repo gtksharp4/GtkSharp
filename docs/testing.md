@@ -9,8 +9,9 @@ dotnet cake build.cake --BuildTarget=Test      # or: dotnet test Source/Tests/Gt
 ```
 
 It requires a **Gtk 4 runtime to be installed**, because it calls into Gtk
-rather than merely compiling against it. CI runs it in a `debian:forky`
-container under `xvfb-run`.
+rather than merely compiling against it. There is no general CI (GitHub Actions
+was removed); the reference run is the `debian:forky` container recipe below,
+under `xvfb-run`.
 
 **Run it on both platforms before trusting a change.** Windows and Linux each
 see defects the other structurally cannot: gvsbuild ships no WebKit, so two
@@ -114,10 +115,30 @@ Both aborts land under a **"Passed!" line with a truncated total** — the failu
 mode this document keeps returning to. 135 of 766 was the shape of the WebKit
 one.
 
+### Verifying the on-demand runtime install
+
+The recipe above installs Gtk with `apt`. The opposite case — a host with **no**
+Gtk, where the bindings fetch a runtime themselves (`GRuntimeInstaller` →
+`GLinuxRuntime`, micromamba + conda-forge) — has its own check:
+`scripts/verify-linux-runtime.sh`. It installs everything **except** Gtk, builds,
+clears `~/.local/share/GtkSharp`, runs a Gtk-loading test so the whole C# path
+fires, and asserts the runtime was fetched.
+
+```sh
+docker run --rm -v "$PWD":/src -w /src debian:forky bash scripts/verify-linux-runtime.sh
+docker run --rm -v "$PWD":/src -w /src fedora:latest bash scripts/verify-linux-runtime.sh
+```
+
+`.github/workflows/linux-runtime-install.yml` runs both on demand and when the
+install path changes — the one workflow this repo keeps. It must run on a **bare**
+image: a host that already has system `libglib` but no Gtk could load that glib
+before the conda one, and conda's gtk4 needs conda's newer glib. The containers
+have neither, so the whole closure comes from conda.
+
 ### The WebKit sandbox, and why the switch is a switch
 
-The alternative to that flag is `GTKSHARP_TESTS_SKIP_WEBKIT=1`, which is what CI
-sets. `TestEnvironment` reads it and skips the WebKit-backed cases —
+The alternative to that flag is `GTKSHARP_TESTS_SKIP_WEBKIT=1`, which the
+container recipe sets. `TestEnvironment` reads it and skips the WebKit-backed cases —
 `OptionalLibraryTests`, and the WebView section in `SampleSectionTests`,
 `ChildWindowTests` and `SectionBrowsingTests`. **Set one or the other when
 running the suite in a container**; leave both unset on a desktop, where the

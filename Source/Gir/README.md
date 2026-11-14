@@ -5,8 +5,8 @@ converts into the checked-in `Source/Libs/<Name>/<Name>-api.xml` descriptions.
 
 Both the `.gir` inputs **and** the converted `-api.xml` outputs are checked in. Conversion runs
 on demand via `dotnet cake build.cake --BuildTarget=RegenerateApi`, never as part of a normal
-build, so `dotnet cake build.cake` stays hermetic and needs no Gtk installed — a property CI
-(`.github/workflows/main.yml`) depends on.
+build, so `dotnet cake build.cake` stays hermetic and needs no Gtk installed — a property the
+containerised test recipe in `docs/testing.md` depends on.
 
 Regenerating an api.xml is an explicit, reviewable, committed act.
 

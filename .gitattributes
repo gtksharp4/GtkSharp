@@ -1,2 +1,6 @@
 # Declare files that will always have CRLF line endings on checkout.
 *.sln text eol=crlf
+
+# Shell scripts must stay LF: they are run inside Linux containers via a mount
+# of the working tree, where a CRLF shebang line fails.
+*.sh text eol=lf

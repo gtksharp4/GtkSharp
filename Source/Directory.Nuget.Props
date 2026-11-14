@@ -1,7 +1,7 @@
 <Project>
     <PropertyGroup>
         <NuGetPackageRoot Condition="'$(NuGetPackageRoot)'=='' and '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))'=='true'">$(USERPROFILE)\.nuget\packages\</NuGetPackageRoot>
-        <NuGetPackageRoot Condition="'$(NuGetPackageRoot)'=='' and '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))'!='true'">~/.nuget/packages/</NuGetPackageRoot>
+        <NuGetPackageRoot Condition="'$(NuGetPackageRoot)'=='' and '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))'!='true'">$(HOME)/.nuget/packages/</NuGetPackageRoot>
         <VersionBuildSuffix Condition="'$(Configuration)'!='Release'">*</VersionBuildSuffix>
         <VersionBuildSuffix Condition="'$(Configuration)'=='Release'">*</VersionBuildSuffix>
         <DirectoryNuGet Condition="'$(DirectoryNuGet)'==''">true</DirectoryNuGet>

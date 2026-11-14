@@ -43,7 +43,7 @@ All build output lands in `BuildOutput/` (`BuildOutput/Tools`, `BuildOutput/$(Co
 dotnet cake build.cake --BuildTarget=Test     # or: dotnet test Source/Tests/GtkSharp.Tests
 ```
 
-It needs a **Gtk 4 runtime present**, because it calls into Gtk rather than merely compiling against it. There is no general CI (GitHub Actions was removed); the reference run is the `debian:forky` container recipe in `docs/testing.md`, under `dbus-run-session -- xvfb-run`. The one checked-in workflow, `.github/workflows/linux-runtime-install.yml`, only verifies the on-demand Gtk 4 runtime install on bare Debian/Fedora.
+It needs a **Gtk 4 runtime present**, because it calls into Gtk rather than merely compiling against it. CI is `.github/workflows/build-and-test.yml`: it builds and runs the full suite on Windows, Linux and macOS, each obtaining Gtk through the binding's own on-demand install (gvsbuild / conda-forge via micromamba / Homebrew). Linux runs in a `debian:forky` container under `dbus-run-session -- xvfb-run`; WebKit is skipped everywhere. Per-OS logic is in `scripts/ci/`. The manual container recipe in `docs/testing.md` is the local equivalent.
 
 Two kinds of test:
 

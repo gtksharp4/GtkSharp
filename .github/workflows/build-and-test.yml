@@ -1,0 +1,47 @@
+name: Build and test
+
+# Builds the bindings and runs the full unit-test suite on Windows, Linux and
+# macOS. Each OS obtains the Gtk 4 runtime through the binding's own on-demand
+# mechanism (dogfooding): gvsbuild on Windows, conda-forge via micromamba on
+# Linux, Homebrew on macOS. WebKit is skipped everywhere (no Windows build; its
+# Linux sandbox needs user namespaces a container lacks). Per-OS logic lives in
+# scripts/ci/.
+on:
+  workflow_dispatch:
+  push:
+    branches: [develop]
+  pull_request:
+    branches: [develop]
+
+jobs:
+  windows:
+    name: windows
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - run: pwsh scripts/ci/test-windows.ps1
+
+  macos:
+    name: macos
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - run: bash scripts/ci/test-macos.sh
+
+  linux:
+    name: linux
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout runs on the host (the bare debian image lacks the node a
+      # container action needs); the build and tests run inside debian:forky via
+      # docker, the working tree mounted in. The container has no system Gtk, so
+      # the bindings' on-demand fetch is exercised.
+      - uses: actions/checkout@v4
+      - name: Build and test in debian:forky
+        run: docker run --rm -v "$PWD":/src -w /src debian:forky bash scripts/ci/test-linux.sh

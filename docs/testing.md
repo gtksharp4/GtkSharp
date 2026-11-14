@@ -9,9 +9,11 @@ dotnet cake build.cake --BuildTarget=Test      # or: dotnet test Source/Tests/Gt
 ```
 
 It requires a **Gtk 4 runtime to be installed**, because it calls into Gtk
-rather than merely compiling against it. There is no general CI (GitHub Actions
-was removed); the reference run is the `debian:forky` container recipe below,
-under `xvfb-run`.
+rather than merely compiling against it. CI
+(`.github/workflows/build-and-test.yml`) builds and runs the full suite on
+Windows, Linux and macOS, each fetching Gtk through the binding's own on-demand
+install; the `debian:forky` container recipe below is the local equivalent of
+the Linux job.
 
 **Run it on both platforms before trusting a change.** Windows and Linux each
 see defects the other structurally cannot: gvsbuild ships no WebKit, so two
@@ -115,25 +117,23 @@ Both aborts land under a **"Passed!" line with a truncated total** — the failu
 mode this document keeps returning to. 135 of 766 was the shape of the WebKit
 one.
 
-### Verifying the on-demand runtime install
+### CI dogfoods the on-demand runtime install
 
-The recipe above installs Gtk with `apt`. The opposite case — a host with **no**
-Gtk, where the bindings fetch a runtime themselves (`GRuntimeInstaller` →
-`GLinuxRuntime`, micromamba + conda-forge) — has its own check:
-`scripts/verify-linux-runtime.sh`. It installs everything **except** Gtk, builds,
-clears `~/.local/share/GtkSharp`, runs a Gtk-loading test so the whole C# path
-fires, and asserts the runtime was fetched.
+The recipe above installs Gtk with `apt`. CI does the opposite: it installs
+**no** Gtk and lets the bindings fetch one (`GRuntimeInstaller` → `GLinuxRuntime`,
+micromamba + conda-forge on Linux; Homebrew on macOS; gvsbuild on Windows). Per-OS
+logic is in `scripts/ci/` (`test-linux.sh`, `test-macos.sh`, `test-windows.ps1`),
+driven by `.github/workflows/build-and-test.yml`. The Linux job runs the script
+locally too:
 
 ```sh
-docker run --rm -v "$PWD":/src -w /src debian:forky bash scripts/verify-linux-runtime.sh
-docker run --rm -v "$PWD":/src -w /src fedora:latest bash scripts/verify-linux-runtime.sh
+docker run --rm -v "$PWD":/src -w /src debian:forky bash scripts/ci/test-linux.sh
 ```
 
-`.github/workflows/linux-runtime-install.yml` runs both on demand and when the
-install path changes — the one workflow this repo keeps. It must run on a **bare**
-image: a host that already has system `libglib` but no Gtk could load that glib
-before the conda one, and conda's gtk4 needs conda's newer glib. The containers
-have neither, so the whole closure comes from conda.
+The Linux job must run on a **bare** image: a host that already has system
+`libglib` but no Gtk could load that glib before the conda one, and conda's gtk4
+needs conda's newer glib. `debian:forky` has neither, so the whole closure comes
+from conda.
 
 ### The WebKit sandbox, and why the switch is a switch
 

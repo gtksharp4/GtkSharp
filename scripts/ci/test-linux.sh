@@ -3,6 +3,10 @@
 # system Gtk, so the bindings fetch the runtime themselves -- dogfooding
 # GRuntimeInstaller -> GLinuxRuntime (conda-forge via micromamba). Runs inside a
 # bare debian container, which has no system Gtk to short-circuit the fetch.
+#
+# Two phases: phase 1 triggers the on-demand fetch through the real C# path;
+# phase 2 compiles the fetched runtime's GSettings schemas (a bare container has
+# none, and libadwaita aborts without a schema source) and runs the whole suite.
 # WebKit is skipped: its sandbox needs user namespaces a container lacks.
 set -euo pipefail
 
@@ -33,11 +37,30 @@ dotnet tool restore
 dotnet cake build.cake --BuildTarget=Prepare --Configuration=Release
 dotnet build Source/Tests/GtkSharp.Tests -c Release
 
-echo "== clear the runtime cache so the on-demand fetch actually runs =="
-rm -rf "$HOME/.local/share/GtkSharp"
-
-echo "== run the full unit-test suite; the first Gtk call fetches the runtime =="
-export GDK_BACKEND=x11
+# Headless-container GUI environment, independent of which runtime is loaded.
+export GDK_BACKEND=x11            # the display is Xvfb
+export GTK_A11Y=none             # no accessibility bus in the container
+export GSETTINGS_BACKEND=memory  # no dconf daemon
 export GTKSHARP_TESTS_SKIP_WEBKIT=1
+export XDG_RUNTIME_DIR="$(mktemp -d)"
+
+RUNTIME_DIR="$HOME/.local/share/GtkSharp"
+ENVP="$RUNTIME_DIR/4.22.4/env"
+# libadwaita is not IsSupported-guarded in the suite, so the fetch must include
+# it (and the desktop schemas it reads); GtkSourceView/WebKit tests are guarded.
+export GTKSHARP_CONDA_PACKAGES="gtk4 libadwaita gsettings-desktop-schemas"
+
+echo "== phase 1: dogfood the on-demand fetch through the real C# path =="
+rm -rf "$RUNTIME_DIR"
+dbus-run-session -- xvfb-run -a \
+  dotnet test Source/Tests/GtkSharp.Tests -c Release --no-build \
+    --filter 'FullyQualifiedName~NativeSymbolTests'
+
+echo "== compile the fetched runtime's GSettings schemas and point GLib at them =="
+"$ENVP/bin/glib-compile-schemas" "$ENVP/share/glib-2.0/schemas"
+export GSETTINGS_SCHEMA_DIR="$ENVP/share/glib-2.0/schemas"
+export XDG_DATA_DIRS="$ENVP/share:/usr/local/share:/usr/share"
+
+echo "== phase 2: full suite, loading the fetched runtime by full path =="
 dbus-run-session -- xvfb-run -a \
   dotnet test Source/Tests/GtkSharp.Tests -c Release --no-build

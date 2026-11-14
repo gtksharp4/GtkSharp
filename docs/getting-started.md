@@ -43,7 +43,9 @@ through gesture controllers rather than widget signals.
 
 Set `GTKSHARP_SKIP_RUNTIME_INSTALL=1` to disable the macOS/Linux on-demand
 install and get the normal "library not found" error instead. On Linux the conda
-source is overridable with `GTKSHARP_MICROMAMBA_URL` and `GTKSHARP_CONDA_CHANNEL`.
+source is overridable with `GTKSHARP_MICROMAMBA_URL` and `GTKSHARP_CONDA_CHANNEL`,
+and `GTKSHARP_CONDA_PACKAGES` (default `gtk4`) adds companion libraries to the
+fetch, e.g. `gtk4 libadwaita`.
 For the optional libraries — `libadwaita-1-0`, `libgtksourceview-5-0`,
 `libwebkitgtk-6.0-4` — install the matching package yourself; only the Gtk core
 is fetched automatically.

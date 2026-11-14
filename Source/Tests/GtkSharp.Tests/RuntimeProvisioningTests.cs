@@ -80,6 +80,22 @@ namespace GtkSharp.Tests
             Assert.Null(GRuntimeProvisioning.MicromambaUrl(Architecture.X86));
         }
 
+        [Fact]
+        public void Conda_packages_default_to_the_gtk_core()
+        {
+            Assert.Equal(new[] { "gtk4" }, GRuntimeProvisioning.CondaPackages(null));
+            Assert.Equal(new[] { "gtk4" }, GRuntimeProvisioning.CondaPackages("   "));
+        }
+
+        [Fact]
+        public void Conda_packages_override_splits_on_whitespace()
+        {
+            Assert.Equal(new[] { "gtk4", "libadwaita" },
+                GRuntimeProvisioning.CondaPackages("gtk4 libadwaita"));
+            Assert.Equal(new[] { "gtk4", "libadwaita" },
+                GRuntimeProvisioning.CondaPackages("  gtk4   libadwaita  "));
+        }
+
         [Theory]
         [InlineData("ubuntu", "apt-get")]
         [InlineData("debian", "apt-get")]

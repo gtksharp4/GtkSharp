@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 
@@ -44,15 +45,21 @@ static class GLinuxRuntime
         }
 
         var channel = Environment.GetEnvironmentVariable("GTKSHARP_CONDA_CHANNEL") ?? "conda-forge";
-        GProcess.Log("fetching the Gtk 4 runtime from " + channel + " (first run only, a few hundred MB)...");
-        return GProcess.Run(bin, new[]
+        var packages = GRuntimeProvisioning.CondaPackages(
+            Environment.GetEnvironmentVariable("GTKSHARP_CONDA_PACKAGES"));
+
+        GProcess.Log("fetching the Gtk 4 runtime (" + string.Join(" ", packages)
+                     + ") from " + channel + " (first run only, a few hundred MB)...");
+
+        var args = new List<string>
         {
             "create", "--yes",
             "--root-prefix", runtimeDir,
             "--prefix", envPrefix,
             "--channel", channel,
-            "gtk4"
-        });
+        };
+        args.AddRange(packages);
+        return GProcess.Run(bin, args.ToArray());
     }
 
     static bool TryPackageManager()

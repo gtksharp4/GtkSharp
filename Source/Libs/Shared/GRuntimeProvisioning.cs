@@ -65,6 +65,17 @@ static class GRuntimeProvisioning
             : "https://github.com/mamba-org/micromamba-releases/releases/latest/download/" + asset;
     }
 
+    // The conda-forge packages the on-demand install pulls. Defaults to the Gtk
+    // core; GTKSHARP_CONDA_PACKAGES can add companion libraries not fetched by
+    // default (e.g. "gtk4 libadwaita"), space-separated.
+    public static string[] CondaPackages(string envValue)
+    {
+        if (string.IsNullOrWhiteSpace(envValue))
+            return new[] { "gtk4" };
+
+        return envValue.Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
+    }
+
     // Maps an /etc/os-release ID to the command that installs the Gtk 4 runtime
     // package on that distro family. Returns null when the distro is unknown.
     public static string[] PackageManagerCommand(string osReleaseId)

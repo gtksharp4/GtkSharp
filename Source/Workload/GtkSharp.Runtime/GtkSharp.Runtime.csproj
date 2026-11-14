@@ -37,7 +37,7 @@
        condition is on the build host, so packages published by CI (which packs
        in a debian:forky container) go without it. -->
     <ItemGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
-        <PackageReference Include="Net4x.NuGetUtility" Version="1.0.13" PrivateAssets="all" />
+        <PackageReference Include="Net4x.NuGetUtility" Version="1.0.17" PrivateAssets="all" />
     </ItemGroup>
     <Import Project="$(NuGetPackageRoot)net4x.nugetutility/$(NuGetUtilityVersion)/build/NuGet.Utility.targets" Condition="$([MSBuild]::IsOSPlatform('Windows')) and Exists('$(NuGetPackageRoot)net4x.nugetutility/$(NuGetUtilityVersion)/build/NuGet.Utility.targets')" />
 </Project>

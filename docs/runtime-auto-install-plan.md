@@ -3,6 +3,15 @@
 Extend the Windows-only auto-install so a consumer of `GtkSharp4` gets a working
 Gtk 4 runtime on macOS and Linux too, without hand-installing it.
 
+> **Status: implemented.** Linux source resolved to blocker #1 option (b):
+> download the micromamba static binary and run `micromamba create -c
+> conda-forge gtk4` (resolves the whole closure, nothing to host), falling back
+> to the distro package manager. See `Source/Libs/Shared/GRuntimeInstaller.cs`,
+> `GRuntimeProvisioning.cs`, `GLibrary.cs`, and the tests in
+> `Source/Tests/GtkSharp.Tests/RuntimeProvisioningTests.cs`. The GL/display
+> host-coupling caveat (blocker #1) is unverified until exercised in a Linux
+> container — see Verification.
+
 ## Decisions (agreed)
 
 | # | Decision |

@@ -76,6 +76,31 @@ class GLibrary
 			return false;
 		}
 
+		ret = LoadOnce(library);
+
+		// Nothing on the system satisfies a core Gtk library. On Unix, fetch a
+		// runtime on demand (Homebrew on macOS, a conda-forge build on Linux,
+		// falling back to the distro package manager) and retry the load once.
+		// GRuntimeInstaller.TryEnsureRuntime runs at most once per process.
+		if (ret == IntPtr.Zero && !FuncLoader.IsWindows
+		    && GRuntimeProvisioning.IsCoreLibrary(library)
+		    && GRuntimeInstaller.TryEnsureRuntime()) {
+			ret = LoadOnce(library);
+		}
+
+		if (ret != IntPtr.Zero) {
+			_libraries[library] = ret;
+		} else {
+			_librariesNotFound.Add(library);
+		}
+
+		return ret != IntPtr.Zero;
+	}
+
+	static IntPtr LoadOnce(Library library)
+	{
+		IntPtr ret;
+
 		if (FuncLoader.IsWindows) {
 			ret = FuncLoader.LoadLibrary(_libraryDefinitions[library][0]);
 
@@ -95,8 +120,13 @@ class GLibrary
 					ret = FuncLoader.LoadLibrary("/opt/homebrew/lib/" + _libraryDefinitions[library][2]);
 				}
 			}
-		} else
-			ret = FuncLoader.LoadLibrary(_libraryDefinitions[library][1]);
+		} else {
+			// A runtime installed on demand lands in a user-cache dir, loaded
+			// by full path rather than via LD_LIBRARY_PATH.
+			ret = TryLoadFromUserDir(library);
+			if (ret == IntPtr.Zero)
+				ret = FuncLoader.LoadLibrary(_libraryDefinitions[library][1]);
+		}
 
 		if (ret == IntPtr.Zero) {
 			for (var i = 0; i < _libraryDefinitions[library].Length; i++) {
@@ -107,13 +137,25 @@ class GLibrary
 			}
 		}
 
-		if (ret != IntPtr.Zero) {
-			_libraries[library] = ret;
-		} else {
-			_librariesNotFound.Add(library);
+		return ret;
+	}
+
+	static IntPtr TryLoadFromUserDir(Library library)
+	{
+		var dir = GRuntimeInstaller.UserLibDir;
+		if (string.IsNullOrEmpty(dir))
+			return IntPtr.Zero;
+
+		foreach (var name in _libraryDefinitions[library]) {
+			var full = Path.Combine(dir, name);
+			if (File.Exists(full)) {
+				var handle = FuncLoader.LoadLibrary(full);
+				if (handle != IntPtr.Zero)
+					return handle;
+			}
 		}
 
-		return ret != IntPtr.Zero;
+		return IntPtr.Zero;
 	}
 
 }

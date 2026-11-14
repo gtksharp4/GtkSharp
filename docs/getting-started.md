@@ -32,14 +32,21 @@ through gesture controllers rather than widget signals.
   nothing else, so a project on an older runtime — .NET Framework 4.x, Mono —
   resolves the same assembly a .NET 10 project does.
 - **A Gtk 4 runtime.** The binding calls into the real libraries; it does not
-  bundle them.
+  bundle them. On every platform it is fetched for you if missing — Windows at
+  build time, macOS and Linux on the first call into Gtk.
 
 | Platform | How to get it |
 |:--|:--|
 | Windows | Nothing to do. `GtkSharp.targets` downloads a gvsbuild runtime into `%LOCALAPPDATA%\Gtk\4.22.4` on first build. Set `SkipGtkInstall=True` to opt out and supply your own. |
-| Debian/Ubuntu | `apt install libgtk-4-1` — plus `libadwaita-1-0`, `libgtksourceview-5-0`, `libwebkitgtk-6.0-4` if you use those |
-| Fedora | `dnf install gtk4` |
-| macOS | `brew install gtk4` |
+| macOS | Nothing to do. If no Gtk 4 is found on the first call, `brew install gtk4` is run for you (needs Homebrew). Or install it yourself up front. |
+| Linux | Nothing to do. If no Gtk 4 is found, a conda-forge build is fetched with micromamba into `~/.local/share/GtkSharp/4.22.4` (honours `XDG_DATA_HOME`); if that fails it falls back to your package manager (`apt install libgtk-4-1`, `dnf install gtk4`, …), which may prompt for your password. |
+
+Set `GTKSHARP_SKIP_RUNTIME_INSTALL=1` to disable the macOS/Linux on-demand
+install and get the normal "library not found" error instead. On Linux the conda
+source is overridable with `GTKSHARP_MICROMAMBA_URL` and `GTKSHARP_CONDA_CHANNEL`.
+For the optional libraries — `libadwaita-1-0`, `libgtksourceview-5-0`,
+`libwebkitgtk-6.0-4` — install the matching package yourself; only the Gtk core
+is fetched automatically.
 
 **WebKit is not available on Windows.** gvsbuild ships no WebKit, so
 `WebkitGtkSharp` and `JavaScriptCoreSharp` are Linux/macOS in practice. Guard any
@@ -583,7 +590,10 @@ dotnet publish -c Release -r linux-x64 --self-contained
 
 The Gtk runtime is **not** included: your users need it installed, or you ship it
 alongside. On Windows the gvsbuild tree that `GtkSharp.targets` downloads is what
-you would redistribute.
+you would redistribute. The macOS/Linux on-demand install is a development
+convenience, not a deployment strategy — for a shipped app, bundle the Gtk 4
+libraries or require them as a dependency rather than relying on a first-run
+download (set `GTKSHARP_SKIP_RUNTIME_INSTALL=1` to be sure it never fires).
 
 There is also a .NET workload, `gtk` (`GtkSharp4.Sdk`, `GtkSharp4.Ref`,
 `GtkSharp4.Runtime`), if you prefer `<TargetFramework>net10.0-gtk4.22</TargetFramework>`

@@ -32,6 +32,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- The wrapper assemblies are strong-named and this project is not, so the
+         internal provisioning logic is unreachable through InternalsVisibleTo.
+         Compile the pure decision file (and the Library enum it uses) into the
+         test assembly directly, the same way the wrappers consume Shared. The
+         side-effecting GRuntimeInstaller is deliberately NOT linked. -->
+    <Compile Include="..\..\Libs\Shared\GRuntimeProvisioning.cs" Link="Shared\GRuntimeProvisioning.cs" />
+    <Compile Include="..\..\Libs\Shared\Library.cs" Link="Shared\Library.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
     <PackageReference Include="xunit" Version="2.9.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />

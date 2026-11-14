@@ -8,9 +8,18 @@ Gtk 4 runtime on macOS and Linux too, without hand-installing it.
 > conda-forge gtk4` (resolves the whole closure, nothing to host), falling back
 > to the distro package manager. See `Source/Libs/Shared/GRuntimeInstaller.cs`,
 > `GRuntimeProvisioning.cs`, `GLibrary.cs`, and the tests in
-> `Source/Tests/GtkSharp.Tests/RuntimeProvisioningTests.cs`. The GL/display
-> host-coupling caveat (blocker #1) is unverified until exercised in a Linux
-> container — see Verification.
+> `Source/Tests/GtkSharp.Tests/RuntimeProvisioningTests.cs`.
+>
+> **GL/display host-coupling caveat (blocker #1): verified resolved on WSLg.**
+> On a clean Ubuntu 22.04 (WSL2) with no system Gtk, the exact micromamba
+> commands produced `env/lib/libgtk-4.so.1` (conda-forge gtk4 4.24.1, 88-package
+> closure). `ldd` showed no unresolved deps (conda's `$ORIGIN` RPATHs resolve
+> the closure, bundled wayland/X11/GL included), a full-path `dlopen` (the
+> GLibrary mechanism) loaded it, and `gtk_init_check` returned TRUE against the
+> WSLg display. Note conda-forge ships 4.24.1, newer than the 4.22 the bindings
+> target — a superset, so compatible; the cache dir name (4.22.4) is only a key.
+> Still worth a native CI run on bare Debian/Fedora to cover non-WSL display
+> stacks.
 
 ## Decisions (agreed)
 

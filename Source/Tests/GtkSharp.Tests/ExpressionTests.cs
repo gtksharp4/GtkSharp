@@ -616,11 +616,14 @@ namespace GtkSharp.Tests
                         Assert.Equal("person " + i, label.Text);
                     }
 
+                    Console.Error.WriteLine("EXPRDIAG: bound 50; calling GC.WaitForPendingFinalizers");
                     GC.Collect();
                     GC.WaitForPendingFinalizers();
                     GC.Collect();
 
+                    Console.Error.WriteLine("EXPRDIAG: finalizers done; calling Pump.For(400)");
                     Pump.For(400);
+                    Console.Error.WriteLine("EXPRDIAG: pump done");
                 }
                 finally
                 {

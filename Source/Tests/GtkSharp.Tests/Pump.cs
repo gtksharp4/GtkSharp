@@ -19,21 +19,14 @@ namespace GtkSharp.Tests
     /// </remarks>
     internal static class Pump
     {
-        const uint TickMs = 10;
-
         /// <summary>Pumps the main loop for <paramref name="milliseconds"/>.</summary>
         public static void For(int milliseconds)
         {
             var clock = Stopwatch.StartNew();
-            var tick = GLib.Timeout.Add(TickMs, () => true);
-            try
+            while (clock.ElapsedMilliseconds < milliseconds)
             {
-                while (clock.ElapsedMilliseconds < milliseconds)
-                    GLib.MainContext.Iteration(true);
-            }
-            finally
-            {
-                GLib.Source.Remove(tick);
+                GLib.MainContext.Iteration(false);
+                System.Threading.Thread.Sleep(1);
             }
         }
 
@@ -44,15 +37,10 @@ namespace GtkSharp.Tests
         public static bool Until(Func<bool> done, int milliseconds = 5000)
         {
             var clock = Stopwatch.StartNew();
-            var tick = GLib.Timeout.Add(TickMs, () => true);
-            try
+            while (!done() && clock.ElapsedMilliseconds < milliseconds)
             {
-                while (!done() && clock.ElapsedMilliseconds < milliseconds)
-                    GLib.MainContext.Iteration(true);
-            }
-            finally
-            {
-                GLib.Source.Remove(tick);
+                GLib.MainContext.Iteration(false);
+                System.Threading.Thread.Sleep(1);
             }
 
             return done();

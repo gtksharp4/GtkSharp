@@ -724,9 +724,11 @@ namespace GtkSharp.Tests
                 // correctly the moment it is asked.
                 Assert.Equal(Ordering.Larger, sorter.Compare(store.GetItem(0), store.GetItem(1)));
 
+                // The sort model reacts to a sorter change synchronously -- the
+                // initial sort and the EmitItemsChanged below are both asserted
+                // without pumping the loop -- so no drain is needed here (and the
+                // old one blocked the headless macOS runner's Quartz loop).
                 sorter.EmitChanged(SorterChange.Different);
-                while (Application.EventsPending())
-                    Application.RunIteration(false);
                 Assert.Equal(new[] { "Zoe", "Grace" }, NamesOf(sorted));
 
                 store.EmitItemsChanged(0, 1, 1);

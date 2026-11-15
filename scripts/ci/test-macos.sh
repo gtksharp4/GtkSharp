@@ -1,13 +1,20 @@
 #!/usr/bin/env bash
-# CI (macOS): build GtkSharp and run the full unit-test suite, letting the
-# bindings fetch the runtime themselves -- dogfooding GRuntimeInstaller, which
-# runs `brew install` on first use.
+# CI (macOS): build GtkSharp and run the unit-test suite, letting the bindings
+# fetch the runtime themselves -- dogfooding GRuntimeInstaller, which runs
+# `brew install` on first use.
 #
 # The only GDK backend Homebrew's gtk4 builds is Quartz, which requires Gtk --
 # NSWindow instantiation and main-loop polling -- to run on thread 0. The dotnet
 # test host owns thread 0, so macOS runs the suite through GtkSharp.Tests.MacRunner
 # instead: it owns thread 0 itself and marshals every test body onto it. Windows
 # and Linux keep using dotnet test.
+#
+# This job is INFORMATIONAL (continue-on-error in the workflow): headless Quartz
+# blocks every GLib main-loop pump once a window has been shown -- the frame
+# clock waits for a frame the headless window server never presents, and
+# GDK-Quartz's poll then blocks in nextEventMatchingMask -- so the run stalls at
+# whichever main-loop test the watchdog reaches first. That needs the frame
+# clock debugged on real macOS hardware. See docs/testing.md.
 #
 # The suite builds libadwaita and GtkSourceView widgets unconditionally, so the
 # on-demand install must fetch them too: GTKSHARP_BREW_PACKAGES adds them to the
@@ -32,11 +39,5 @@ dotnet build Source/Tests/GtkSharp.Tests.MacRunner -c Release
 
 echo "== run the full suite on thread 0; the first Gtk call dogfoods the Homebrew install =="
 export GTKSHARP_TESTS_SKIP_WEBKIT=1
-# Software renderer: the headless window server never presents a GL frame, so a
-# shown window's frame clock stays waiting for one (gdk_frame_timings_presented:
-# skipped frame) and the next EventsPending/iteration blocks on it. The cairo
-# renderer presents frames in-process, so the frame clock settles.
-export GSK_RENDERER=cairo
-export GDK_DEBUG=gl-disable
 export GTKSHARP_BREW_PACKAGES="gtk4 gtksourceview5 libadwaita gsettings-desktop-schemas"
 dotnet exec BuildOutput/Tests/Release/MacRunner/GtkSharp.Tests.MacRunner.dll

@@ -29,6 +29,15 @@ jobs:
     name: macos
     runs-on: macos-latest
     timeout-minutes: 30
+    # Informational, not a gate. The suite runs on thread 0 through the macOS
+    # runner (scripts/ci/test-macos.sh), but headless Quartz blocks every GLib
+    # main-loop pump once a window has been shown -- its frame clock waits for a
+    # frame the headless window server never presents, and GDK-Quartz's poll
+    # then blocks in nextEventMatchingMask regardless of the non-blocking flag.
+    # That cannot be worked around from managed code; it needs the frame clock
+    # debugged on real macOS hardware. Until then macOS does not block merges;
+    # Windows and Linux are the gates. See docs/testing.md.
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4

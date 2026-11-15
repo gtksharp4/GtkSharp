@@ -215,7 +215,36 @@ libadwaita and GtkSourceView widgets unconditionally, so `GTKSHARP_BREW_PACKAGES
 adds `gtksourceview5 libadwaita` to the `brew install` the first Gtk call runs,
 the way `GTKSHARP_CONDA_PACKAGES` does on Linux. Both are read by
 `GRuntimeProvisioning` (`BrewPackages`/`CondaPackages`), which the tests cover
-directly.
+directly. `TestEnvironment.IsMacOS` keys on a `GTKSHARP_MACRUNNER` env var the
+runner sets, not only `OperatingSystem.IsMacOS()` — which returned **false**
+inside the runner on the macOS CI image, so the guards below never fired until
+the env var backed them up.
+
+Three families of tests are guarded off on the runner (`TestEnvironment.IsMacOS`):
+shown-`DrawingArea` draw/resize tests (the frame clock, below), and two
+keycode/accelerator tests (the headless Gdk keymap is empty).
+
+**Why the job is informational.** Even with those skips, the run cannot finish:
+once any test shows a window, its frame clock waits for a frame the headless
+macOS window server never presents —
+
+```text
+Gdk-WARNING: gdk_frame_timings_presented() called on skipped frame.
+```
+
+— and from then on *every* GLib main-loop pump blocks. `Application.EventsPending`,
+`GLib.MainContext.Iteration(false)` and `Iteration(true)` all block inside
+GDK-Quartz's `nextEventMatchingMask` regardless of the may-block flag, so any
+test that drains the loop (a GC-then-settle test, a sorter-changed assertion)
+wedges thread 0; the runner's watchdog then aborts after 120 s and names
+whichever test the non-deterministic order reached first. Forcing the cairo
+renderer (`GSK_RENDERER=cairo`, `GDK_DEBUG=gl-disable`), a ticking GLib timeout,
+non-blocking iteration and dropping the between-test drain were all tried and
+none lifts the block — it is below managed code, in the Quartz event loop. So
+`scripts/ci/test-macos.sh` runs under `continue-on-error`: macOS does not gate
+merges, Windows and Linux do, and the frame clock wants debugging on real macOS
+hardware. The runner, the thread-0 handoff and the provisioning all stand and
+work up to that point.
 
 ---
 

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
 using GtkSharp.Tests;
@@ -19,6 +20,16 @@ internal static class Program
     private static volatile int _skipped;
     private static volatile bool _errored;
 
+    // Stall detection. A test that blocks the Gtk thread (a modal dialog that
+    // waits for a response that never comes on headless macOS, say) would
+    // otherwise hang thread 0 silently until the job's wall-clock timeout. The
+    // watchdog runs on its own thread, so it fires even while thread 0 is stuck.
+    private static readonly Stopwatch Clock = Stopwatch.StartNew();
+    private static long _lastActivityTicks;
+    private static volatile string _currentTest = "(startup)";
+    private static volatile bool _testsStarted;
+    private const int StallSeconds = 120;
+
     // STA so thread 0 matches what Gtk wants on Windows (OleInitialize); a no-op
     // on macOS, where thread 0 is simply the one Quartz requires.
     [STAThread]
@@ -37,6 +48,9 @@ internal static class Program
 
         GtkThreadBridge.Queue = new BlockingCollection<Action>();
 
+        Touch();
+        new Thread(Watchdog) { IsBackground = true, Name = "watchdog" }.Start();
+
         var assemblyPath = typeof(GtkFixture).Assembly.Location;
         var worker = new Thread(() => RunTests(assemblyPath))
         {
@@ -53,17 +67,19 @@ internal static class Program
         return _failed > 0 || _errored ? 1 : 0;
     }
 
-    // Non-zero when the calling thread is the process's main thread (thread 0),
-    // the one Cocoa/Quartz accept for NSWindow and event handling.
-    [DllImport("/usr/lib/libSystem.dylib")]
-    private static extern int pthread_main_np();
-
     private static void RunTests(string assemblyPath)
     {
         try
         {
             using var runner = AssemblyRunner.WithoutAppDomain(assemblyPath);
 
+            runner.OnTestStarting = info =>
+            {
+                _currentTest = info.TestDisplayName;
+                _testsStarted = true;
+                Touch();
+            };
+            runner.OnTestFinished = _ => Touch();
             runner.OnTestFailed = info =>
                 Console.WriteLine($"FAIL {info.TestDisplayName}: {info.ExceptionMessage}");
             runner.OnErrorMessage = info =>
@@ -95,4 +111,37 @@ internal static class Program
             GtkThreadBridge.Queue.CompleteAdding();
         }
     }
+
+    private static void Touch() => Interlocked.Exchange(ref _lastActivityTicks, Clock.ElapsedTicks);
+
+    private static void Watchdog()
+    {
+        while (!Finished.IsSet)
+        {
+            Thread.Sleep(5000);
+
+            // Only once tests are running: the first Gtk call may spend minutes
+            // in the on-demand Homebrew install, which is not a stall.
+            if (!_testsStarted)
+                continue;
+
+            var idle = (Clock.ElapsedTicks - Interlocked.Read(ref _lastActivityTicks))
+                       / (double)Stopwatch.Frequency;
+            if (idle > StallSeconds)
+            {
+                Console.Error.WriteLine(
+                    $"MacRunner STALL: '{_currentTest}' ran {idle:F0}s with no progress and is " +
+                    "blocking the Gtk thread; aborting. It likely opens a modal that never returns " +
+                    "on headless macOS.");
+                Console.Out.Flush();
+                Console.Error.Flush();
+                Environment.Exit(3);
+            }
+        }
+    }
+
+    // Non-zero when the calling thread is the process's main thread (thread 0),
+    // the one Cocoa/Quartz accept for NSWindow and event handling.
+    [DllImport("/usr/lib/libSystem.dylib")]
+    private static extern int pthread_main_np();
 }

@@ -17,6 +17,7 @@ jobs:
   windows:
     name: windows
     runs-on: windows-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
@@ -27,6 +28,7 @@ jobs:
   macos:
     name: macos
     runs-on: macos-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
@@ -37,6 +39,7 @@ jobs:
   linux:
     name: linux
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       # Checkout runs on the host (the bare debian image lacks the node a
       # container action needs); the build and tests run inside debian:forky via

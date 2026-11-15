@@ -96,13 +96,13 @@ namespace GtkSharp.Tests
             {
                 using var array = Pointers(0x10);
 
-                Assert.Equal(1, array.Count);
+                Assert.Single(array);
 
                 array.Add(new IntPtr(0x20));
                 Assert.Equal(2, array.Count);
 
                 array.Remove(new IntPtr(0x10));
-                Assert.Equal(1, array.Count);
+                Assert.Single(array);
             });
         }
 
@@ -183,7 +183,7 @@ namespace GtkSharp.Tests
                 Assert.False(collection.IsSynchronized);
 
                 lock (collection.SyncRoot)
-                    Assert.Equal(1, collection.Count);
+                    Assert.Single(collection.Cast<object>());
             });
         }
 

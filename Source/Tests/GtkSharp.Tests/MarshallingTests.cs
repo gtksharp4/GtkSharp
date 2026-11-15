@@ -352,7 +352,7 @@ namespace GtkSharp.Tests
 
                 owned.Empty();
 
-                Assert.Equal(0, owned.Count);
+                Assert.Empty((IEnumerable) owned);
             });
         }
 
@@ -403,7 +403,7 @@ namespace GtkSharp.Tests
 
                 array.Remove(doomed);
 
-                Assert.Equal(1, array.Count);
+                Assert.Single(array);
                 Assert.Equal("kept", array[0]);
             });
         }

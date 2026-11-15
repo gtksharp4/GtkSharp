@@ -105,7 +105,6 @@ namespace GtkSharp.Tests
             {
                 using var list = new GLib.List(typeof(string));
 
-                Assert.Equal(0, list.Count);
                 Assert.Empty(list.Cast<object>());
 
                 var destination = new object[0];
@@ -247,7 +246,7 @@ namespace GtkSharp.Tests
 
                 list.Empty();
 
-                Assert.Equal(0, list.Count);
+                Assert.Empty(list.Cast<object>());
                 Assert.Equal(IntPtr.Zero, list.Handle);
             });
         }

@@ -46,6 +46,13 @@ namespace GtkSharp.Tests
 
         static bool PumpUntil(Func<bool> condition, int timeoutMs = 5000)
         {
+            // These tests wait for a GtkSource async file save/load callback,
+            // which only arrives when the main loop is pumped -- impossible on the
+            // headless macOS runner (Quartz blocks the iteration). Covered on
+            // Windows and Linux.
+            Skip.If(TestEnvironment.IsMacOS,
+                    "headless macOS cannot pump the main loop for a GtkSource async callback.");
+
             var clock = System.Diagnostics.Stopwatch.StartNew();
             while (!condition() && clock.ElapsedMilliseconds < timeoutMs)
             {
@@ -60,7 +67,7 @@ namespace GtkSharp.Tests
 
         // -------------------------------------------------------- source marks
 
-        [Fact]
+        [SkippableFact]
         public void A_source_mark_is_found_at_the_line_it_was_put_on()
         {
             // Source marks are how a gutter shows breakpoints and errors. The
@@ -84,7 +91,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Marks_of_a_different_category_are_not_returned()
         {
             // The category filter is the whole point of the API: an editor puts
@@ -104,7 +111,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Walking_forward_finds_the_next_mark_and_stops_at_the_last()
         {
             Run(() =>
@@ -127,7 +134,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Removing_marks_over_a_range_removes_only_those_in_it()
         {
             Run(() =>
@@ -146,7 +153,7 @@ namespace GtkSharp.Tests
 
         // ------------------------------------------------------ style schemes
 
-        [Fact]
+        [SkippableFact]
         public void The_style_scheme_manager_publishes_schemes_it_can_then_hand_over()
         {
             // The ids come from GtkSourceView, so the test asks it for the list
@@ -171,13 +178,13 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Asking_for_a_scheme_that_does_not_exist_gives_nothing()
         {
             Run(() => Assert.Null(GtkSource.StyleSchemeManager.Default.GetScheme("no-such-scheme-9f2a")));
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_buffer_keeps_the_style_scheme_it_is_given()
         {
             Run(() =>
@@ -196,7 +203,7 @@ namespace GtkSharp.Tests
 
         // ---------------------------------------------------------- languages
 
-        [Fact]
+        [SkippableFact]
         public void A_language_reports_the_details_the_manager_indexed_it_under()
         {
             Run(() =>
@@ -215,7 +222,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_buffer_given_a_language_highlights_with_it()
         {
             Run(() =>
@@ -230,7 +237,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Context_classes_say_which_part_of_the_syntax_an_iterator_is_in()
         {
             // The feature an editor uses to decide whether the cursor is inside a
@@ -257,7 +264,7 @@ namespace GtkSharp.Tests
 
         // ------------------------------------------------- buffer manipulation
 
-        [Fact]
+        [SkippableFact]
         public void Sorting_lines_reorders_only_the_range_it_was_given()
         {
             // Arithmetic the test can do itself, and the lines outside the range
@@ -281,7 +288,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Sorting_can_be_reversed_and_can_ignore_case()
         {
             Run(() =>
@@ -295,7 +302,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Joining_lines_replaces_the_newlines_between_them()
         {
             Run(() =>
@@ -312,7 +319,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Changing_case_rewrites_only_the_selected_range()
         {
             Run(() =>
@@ -328,7 +335,7 @@ namespace GtkSharp.Tests
 
         // --------------------------------------------------- File load and save
 
-        [Fact]
+        [SkippableFact]
         public void A_buffer_saved_through_GtkSource_File_lands_on_disk_as_its_text()
         {
             // The oracle is entirely outside the library: the bytes File.ReadAllText
@@ -375,7 +382,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_buffer_loaded_through_GtkSource_File_holds_what_the_file_held()
         {
             // The other direction, and the text came from the test rather than
@@ -416,7 +423,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void The_implicit_trailing_newline_is_on_by_default_and_can_be_turned_off()
         {
             // The setting behind the two round-trip tests above. With it on, a
@@ -436,7 +443,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Turning_the_implicit_newline_off_writes_the_text_unchanged()
         {
             Run(() =>
@@ -475,7 +482,7 @@ namespace GtkSharp.Tests
 
         // ------------------------------------------------------------- the view
 
-        [Fact]
+        [SkippableFact]
         public void A_source_view_keeps_the_display_settings_it_is_given()
         {
             Run(() =>
@@ -503,7 +510,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_source_view_shows_the_buffer_it_was_built_around()
         {
             Run(() =>

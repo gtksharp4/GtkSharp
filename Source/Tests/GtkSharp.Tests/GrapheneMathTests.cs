@@ -1126,12 +1126,11 @@ namespace GtkSharp.Tests
         {
             // Unlike graphene_matrix_interpolate, spherical interpolation of
             // quaternions has no decompose-and-recompose in the way, so t = 0 is
-            // exact to the last bit. t = 1 is NOT, quite: graphene evaluates
-            // sin((1-t)w)/sin(w) and sin(tw)/sin(w) rather than special-casing
-            // the ends, and the second of those is 1 only to within rounding --
-            // about 5e-8 here, one part in 1.4e7, which is a couple of ulp of a
-            // float. Close enough for an animation and not close enough for an
-            // equality test, which is the point.
+            // exact to the last bit. t = 1 is close, but how close is the
+            // platform's libm business: graphene evaluates sin(tw)/sin(w) rather
+            // than special-casing the ends, which rounds to about 5e-8 off on x64
+            // yet lands on the endpoint exactly on arm64. So t = 1 is asserted
+            // close, not unequal.
             //
             // Halfway between no rotation and a quarter turn is an eighth turn,
             // and the quaternion for an angle a about z is (0,0,sin(a/2),cos(a/2)).
@@ -1145,7 +1144,6 @@ namespace GtkSharp.Tests
                 Assert.Equal(none.ToVec4().ToFloat(), none.Slerp(quarter, 0).ToVec4().ToFloat());
 
                 var atOne = none.Slerp(quarter, 1).ToVec4().ToFloat();
-                Assert.NotEqual(quarter.ToVec4().ToFloat(), atOne);
                 for (int i = 0; i < 4; i++)
                     Assert.Equal(quarter.ToVec4().ToFloat()[i], atOne[i], 6);
 

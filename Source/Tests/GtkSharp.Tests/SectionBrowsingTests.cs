@@ -75,7 +75,7 @@ namespace GtkSharp.Tests
 
                 // And the code view holds that section's own source.
                 var source = app.Code.Buffer.Text;
-                Assert.False(string.IsNullOrWhiteSpace(source), $"no source loaded for '{label}'");
+                Assert.False(string.IsNullOrWhiteSpace(source), $"no source loaded for '{label}' in category '{category}'");
                 Assert.Contains("class", source);
             });
         }

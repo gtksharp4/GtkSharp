@@ -398,7 +398,7 @@ namespace GtkSharp.Tests
 
                 var read = (GLib.ValueArray) new GLib.Value(array);
 
-                Assert.Equal(1, read.Count);
+                Assert.Single(read);
                 Assert.Equal("carried", (string) (GLib.Value) read[0]);
             });
         }
@@ -494,7 +494,7 @@ namespace GtkSharp.Tests
                 Assert.Throws<ArgumentException>(() => new GLib.DateTime(new IntPtr(2)));
 
                 // The numeric overloads, reached with a suffix, still work.
-                Assert.Equal(0, new GLib.ValueArray(2u).Count);
+                Assert.Empty(new GLib.ValueArray(2u));
             });
         }
     }

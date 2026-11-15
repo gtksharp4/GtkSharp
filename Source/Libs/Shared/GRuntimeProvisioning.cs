@@ -76,6 +76,20 @@ static class GRuntimeProvisioning
         return envValue.Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
     }
 
+    // The Homebrew formulae the macOS on-demand install runs. Mirrors
+    // CondaPackages so macOS and Linux provision the same way: defaults to the
+    // Gtk core; GTKSHARP_BREW_PACKAGES can add companion formulae not fetched by
+    // default (e.g. "gtk4 gtksourceview5 libadwaita"), space-separated.
+    public const string BrewPackagesEnvVar = "GTKSHARP_BREW_PACKAGES";
+
+    public static string[] BrewPackages(string envValue)
+    {
+        if (string.IsNullOrWhiteSpace(envValue))
+            return new[] { "gtk4" };
+
+        return envValue.Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
+    }
+
     // Maps an /etc/os-release ID to the command that installs the Gtk 4 runtime
     // package on that distro family. Returns null when the distro is unknown.
     public static string[] PackageManagerCommand(string osReleaseId)

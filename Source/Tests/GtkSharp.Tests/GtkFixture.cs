@@ -23,29 +23,44 @@ namespace GtkSharp.Tests
     /// that a failure in layout, a draw function or an idle callback is
     /// attributed to the test that caused it rather than to whichever test
     /// happens to run next.
+    ///
+    /// When an external runner has set <see cref="GtkThreadBridge.Queue"/> (the
+    /// macOS CI runner, which must put Gtk on thread 0), the fixture marshals
+    /// onto that queue instead of starting a thread. See
+    /// <see cref="GtkThreadBridge"/>.
     /// </remarks>
     public sealed class GtkFixture : IDisposable
     {
-        private readonly BlockingCollection<Action> _queue = new BlockingCollection<Action>();
-        private readonly Thread _thread;
+        private readonly BlockingCollection<Action> _queue;
+        private readonly Thread _thread;        // null when a runner owns the Gtk thread
 
         public GtkFixture()
         {
-            var ready = new ManualResetEventSlim();
             ExceptionDispatchInfo startupError = null;
+
+            if (GtkThreadBridge.Queue != null)
+            {
+                // A runner owns thread 0 and pumps the queue; just initialise Gtk
+                // on it. No thread of our own, and Dispose must not complete the
+                // shared queue -- the runner's lifecycle owns it.
+                _queue = GtkThreadBridge.Queue;
+                Marshal(() =>
+                {
+                    try { Application.Init(); }
+                    catch (Exception e) { startupError = ExceptionDispatchInfo.Capture(e); }
+                });
+                startupError?.Throw();
+                return;
+            }
+
+            var ready = new ManualResetEventSlim();
+            _queue = new BlockingCollection<Action>();
 
             _thread = new Thread(() =>
             {
                 try
                 {
                     Application.Init();
-
-                    // On macOS the only backend is Quartz, whose poll function
-                    // calls a Cocoa API that aborts off the main thread. This
-                    // fixture runs Gtk on a background thread, so restore the
-                    // plain g_poll; see MacQuartzMainLoop.
-                    if (OperatingSystem.IsMacOS())
-                        MacQuartzMainLoop.RestoreDefaultPollFunc();
                 }
                 catch (Exception e)
                 {
@@ -59,11 +74,7 @@ namespace GtkSharp.Tests
                 foreach (var work in _queue.GetConsumingEnumerable())
                 {
                     work();
-
-                    // Bounded: a test that queues work indefinitely should fail
-                    // by timing out rather than by hanging the whole run.
-                    for (int i = 0; i < 200 && Application.EventsPending(); i++)
-                        Application.RunIteration(false);
+                    GtkThreadBridge.PumpPending();
                 }
             });
 
@@ -82,26 +93,17 @@ namespace GtkSharp.Tests
         public void Invoke(Action action)
         {
             ExceptionDispatchInfo error = null;
-            using (var done = new ManualResetEventSlim())
+            Marshal(() =>
             {
-                _queue.Add(() =>
+                try
                 {
-                    try
-                    {
-                        action();
-                    }
-                    catch (Exception e)
-                    {
-                        error = ExceptionDispatchInfo.Capture(e);
-                    }
-                    finally
-                    {
-                        done.Set();
-                    }
-                });
-
-                done.Wait();
-            }
+                    action();
+                }
+                catch (Exception e)
+                {
+                    error = ExceptionDispatchInfo.Capture(e);
+                }
+            });
 
             error?.Throw();
         }
@@ -113,8 +115,24 @@ namespace GtkSharp.Tests
             return result;
         }
 
+        /// <summary>Enqueues work on the Gtk thread and blocks until it has run.</summary>
+        private void Marshal(Action work)
+        {
+            using var done = new ManualResetEventSlim();
+            _queue.Add(() =>
+            {
+                try { work(); }
+                finally { done.Set(); }
+            });
+
+            done.Wait();
+        }
+
         public void Dispose()
         {
+            if (_thread == null)
+                return;   // the runner owns the shared queue and the thread.
+
             _queue.CompleteAdding();
             _thread.Join(TimeSpan.FromSeconds(10));
         }

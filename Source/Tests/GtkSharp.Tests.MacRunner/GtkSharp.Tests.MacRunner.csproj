@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- macOS-only test entry point. Quartz requires Gtk on thread 0, which the
+       dotnet test host owns, so macOS CI runs the suite through this console app
+       instead: it owns thread 0 itself and marshals every test body onto it.
+       Windows and Linux keep using dotnet test. Not in GtkSharp.sln and not
+       packed; test-macos.sh builds it directly. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <SignAssembly>false</SignAssembly>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <OutputPath>..\..\..\BuildOutput\Tests\$(Configuration)\MacRunner</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- AssemblyRunner drives the test assembly in-process. -->
+    <PackageReference Include="xunit.runner.utility" Version="2.9.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Copies GtkSharp.Tests.dll and its whole dependency closure beside the
+         runner, so AssemblyRunner can load it by path. -->
+    <ProjectReference Include="..\GtkSharp.Tests\GtkSharp.Tests.csproj" />
+  </ItemGroup>
+
+</Project>

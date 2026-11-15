@@ -96,6 +96,22 @@ namespace GtkSharp.Tests
                 GRuntimeProvisioning.CondaPackages("  gtk4   libadwaita  "));
         }
 
+        [Fact]
+        public void Brew_packages_default_to_the_gtk_core()
+        {
+            Assert.Equal(new[] { "gtk4" }, GRuntimeProvisioning.BrewPackages(null));
+            Assert.Equal(new[] { "gtk4" }, GRuntimeProvisioning.BrewPackages("   "));
+        }
+
+        [Fact]
+        public void Brew_packages_override_splits_on_whitespace()
+        {
+            Assert.Equal(new[] { "gtk4", "gtksourceview5", "libadwaita" },
+                GRuntimeProvisioning.BrewPackages("gtk4 gtksourceview5 libadwaita"));
+            Assert.Equal(new[] { "gtk4", "gtksourceview5", "libadwaita" },
+                GRuntimeProvisioning.BrewPackages("  gtk4   gtksourceview5  libadwaita  "));
+        }
+
         [Theory]
         [InlineData("ubuntu", "apt-get")]
         [InlineData("debian", "apt-get")]

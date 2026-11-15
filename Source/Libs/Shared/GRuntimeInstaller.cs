@@ -67,14 +67,23 @@ static class GRuntimeInstaller
 
     static bool EnsureOnMac()
     {
+        var packages = GRuntimeProvisioning.BrewPackages(
+            Environment.GetEnvironmentVariable(GRuntimeProvisioning.BrewPackagesEnvVar));
+
         var brew = GProcess.Which("brew");
         if (brew == null)
         {
-            GProcess.Log("Gtk 4 is missing and Homebrew was not found. Install it with: brew install gtk4");
+            GProcess.Log("Gtk 4 is missing and Homebrew was not found. Install it with: brew install "
+                         + string.Join(" ", packages));
             return false;
         }
 
-        GProcess.Log("Gtk 4 is missing; installing it with Homebrew (first run only)...");
-        return GProcess.Run(brew, new[] { "install", "gtk4" });
+        GProcess.Log("Gtk 4 is missing; installing it with Homebrew (" + string.Join(" ", packages)
+                     + ", first run only)...");
+
+        var args = new string[packages.Length + 1];
+        args[0] = "install";
+        Array.Copy(packages, 0, args, 1, packages.Length);
+        return GProcess.Run(brew, args);
     }
 }

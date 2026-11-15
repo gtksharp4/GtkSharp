@@ -4,23 +4,21 @@ using Xunit;
 namespace GtkSharp.Tests
 {
     /// <summary>
-    /// Pins the contract the macOS Quartz backend violated: once a
-    /// <c>GdkDisplay</c> is open, the GLib main loop must be iterable from the
-    /// thread <see cref="GtkFixture"/> runs Gtk on.
+    /// Pins the contract the macOS Quartz backend violated: a toplevel must be
+    /// realizable and the main loop iterable from the thread Gtk runs on.
     /// </summary>
     /// <remarks>
     /// GDK-Quartz replaces the main-context poll function with one that calls
-    /// Cocoa's <c>nextEventMatchingMask</c>, which aborts off thread 0. Because
-    /// the fixture runs Gtk on a background thread, the first
-    /// <c>EventsPending</c>/<c>RunIteration</c> after a window opened used to
-    /// crash the whole test host on macOS -- the 24 pure tests that never open a
-    /// display passed, then the run aborted. <see cref="MacQuartzMainLoop"/>
-    /// restores <c>g_poll</c> to undo that substitution.
+    /// Cocoa's <c>nextEventMatchingMask</c>, and <c>NSWindow</c> instantiation is
+    /// likewise main-thread-only -- both abort off thread 0. Because
+    /// <see cref="GtkFixture"/> runs Gtk on a background thread under
+    /// <c>dotnet test</c>, presenting a window used to crash the whole test host
+    /// on macOS. The macOS CI entry point runs Gtk on thread 0 instead (see
+    /// <see cref="GtkThreadBridge"/>).
     ///
     /// On Windows and X11 this is a harmless smoke test; on macOS it is the
-    /// regression guard. It cannot assert the poll function directly (GLib
-    /// exposes no getter), so it reproduces the crash path instead: open a
-    /// display-backed window, then pump the loop.
+    /// regression guard. It reproduces the crash path: open a display-backed
+    /// window, then pump the loop.
     /// </remarks>
     public class QuartzMainLoopRegressionTests : GtkTestBase
     {
@@ -35,7 +33,7 @@ namespace GtkSharp.Tests
                 try
                 {
                     // Presenting opens/realizes against the default GdkDisplay,
-                    // which is where Quartz attaches its event source.
+                    // which is where Quartz instantiates its NSWindow.
                     window.Present();
 
                     for (int i = 0; i < 200 && Application.EventsPending(); i++)
@@ -46,7 +44,8 @@ namespace GtkSharp.Tests
                     window.Destroy();
                 }
 
-                // Reaching here means the loop iterated without aborting the host.
+                // Reaching here means the window realized and the loop iterated
+                // without aborting the host.
                 Assert.True(true);
             });
         }

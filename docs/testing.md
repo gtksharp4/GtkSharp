@@ -180,32 +180,42 @@ Docker's default profile is what blocks `clone(CLONE_NEWUSER)` — and still not
 enough for WebKit. Only `--privileged` is, and that is a far wider grant than a
 job holding a `packages:write` token should have.
 
-### macOS: Gtk runs on a background thread, but Quartz wants the main one
+### macOS: Gtk must run on thread 0, so a separate runner owns it
 
 `GtkFixture` runs Gtk on a dedicated background thread and marshals every test
 body onto it. On Windows (win32) and Linux (X11 under Xvfb) that is fine. On
 macOS it is not: Homebrew's gtk4 is built `-Dmacos-backend=true
 -Dx11-backend=false` and GTK's broadway backend is off by default, so **Quartz is
-the only backend**. GDK-Quartz replaces the main context's poll function with one
-that calls Cocoa's `nextEventMatchingMask`, which aborts unless it runs on
-thread 0:
+the only backend**, and Quartz requires thread 0 — the process's first thread —
+for both main-loop polling and `NSWindow` instantiation:
 
 ```text
 *** Terminating app ... reason: 'nextEventMatchingMask should only be called from the Main Thread!'
+*** Terminating app ... reason: 'NSWindow should only be instantiated on the main thread!'
 ```
 
-Same truncated-"Passed!" shape as the others: the pure tests (GLib, Cairo,
-Graphene) that never open a `GdkDisplay` pass, then the first main-loop
-iteration after a window opens aborts the host — 24 of the suite, last seen.
+Same truncated-"Passed!" shape as the others: the tests that never touch a
+display pass, then the first that polls the loop or realizes a toplevel aborts
+the host.
 
 Under `dotnet test`/VSTest, thread 0 belongs to the test host, so the fixture
-cannot take it. The suite injects no real input events — it drives widgets,
-idles and timeouts — so `MacQuartzMainLoop.RestoreDefaultPollFunc` (called from
-the fixture after `Application.Init`, macOS only) points the default context's
-poll function back at plain `g_poll`. The loop then iterates off the main thread
-without touching AppKit, and GLib sources still fire.
-`QuartzMainLoopRegressionTests` pins the crash path: open a window, pump the
-loop.
+cannot take it. macOS therefore runs the suite through **`GtkSharp.Tests.MacRunner`**
+(`scripts/ci/test-macos.sh`, `dotnet exec`, not `dotnet test`): a console app
+whose `[STAThread] Main` owns thread 0, runs xunit on a background thread, and
+pumps the Gtk work queue (and the main loop) on thread 0. `GtkThreadBridge` is
+the hand-off — when its queue is set, `GtkFixture` marshals onto it instead of
+spawning a thread; it stays null under `dotnet test`, so Windows and Linux are
+unchanged. The runner asserts `pthread_main_np()` first, so a CLR that ever
+started `Main` off the main thread fails with a named error rather than a deep
+Gtk abort. `QuartzMainLoopRegressionTests` pins the crash path: open a window,
+pump the loop.
+
+Companion libraries are provisioned symmetrically with Linux: the suite builds
+libadwaita and GtkSourceView widgets unconditionally, so `GTKSHARP_BREW_PACKAGES`
+adds `gtksourceview5 libadwaita` to the `brew install` the first Gtk call runs,
+the way `GTKSHARP_CONDA_PACKAGES` does on Linux. Both are read by
+`GRuntimeProvisioning` (`BrewPackages`/`CondaPackages`), which the tests cover
+directly.
 
 ---
 

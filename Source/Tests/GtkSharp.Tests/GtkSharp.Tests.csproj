@@ -21,6 +21,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <!-- The macOS runner drives this assembly and marshals onto GtkThreadBridge,
+         which is internal. -->
+    <InternalsVisibleTo Include="GtkSharp.Tests.MacRunner" />
+  </ItemGroup>
+
+  <ItemGroup>
     <!-- Builder(Assembly, resourceName, ...) is the constructor the templates and
          the getting-started guide use, and it can only be exercised against a
          real manifest resource. LogicalName is pinned so the test names the

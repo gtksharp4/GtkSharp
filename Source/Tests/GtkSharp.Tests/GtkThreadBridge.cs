@@ -37,7 +37,13 @@ namespace GtkSharp.Tests
             foreach (var work in Queue.GetConsumingEnumerable())
             {
                 work();
-                PumpPending();
+
+                // No between-test drain here, unlike the owned-thread fixture.
+                // On the macOS Quartz backend Application.EventsPending blocks
+                // whenever a shown window still has a frame clock with a pending
+                // frame the headless server never presents, which would wedge
+                // thread 0 between tests. Each test pumps its own loop (through
+                // Pump) where it needs to.
             }
         }
 
@@ -45,7 +51,8 @@ namespace GtkSharp.Tests
         /// Runs pending main-loop work without blocking, so a failure in layout,
         /// a draw function or an idle callback is attributed to the test that
         /// caused it. Bounded so a test that queues work forever fails by timing
-        /// out rather than hanging the run.
+        /// out rather than hanging the run. Used by the owned-thread fixture on
+        /// Windows and Linux; see <see cref="RunLoop"/> for why macOS skips it.
         /// </summary>
         public static void PumpPending()
         {

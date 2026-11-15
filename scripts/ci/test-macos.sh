@@ -4,6 +4,10 @@
 # which runs `brew install gtk4` on first use. WebKit is skipped. Assumes the
 # runner already has .NET 10 (actions/setup-dotnet) and Homebrew (preinstalled on
 # GitHub macOS runners).
+#
+# No GDK_BACKEND override here: Homebrew's gtk4 builds only the Quartz backend.
+# Quartz's main loop must be polled from thread 0, which the test host owns, so
+# GtkFixture restores g_poll on macOS (MacQuartzMainLoop) -- see docs/testing.md.
 set -euo pipefail
 
 export DOTNET_CLI_TELEMETRY_OPTOUT=1

@@ -39,6 +39,13 @@ namespace GtkSharp.Tests
                 try
                 {
                     Application.Init();
+
+                    // On macOS the only backend is Quartz, whose poll function
+                    // calls a Cocoa API that aborts off the main thread. This
+                    // fixture runs Gtk on a background thread, so restore the
+                    // plain g_poll; see MacQuartzMainLoop.
+                    if (OperatingSystem.IsMacOS())
+                        MacQuartzMainLoop.RestoreDefaultPollFunc();
                 }
                 catch (Exception e)
                 {

@@ -180,6 +180,33 @@ Docker's default profile is what blocks `clone(CLONE_NEWUSER)` — and still not
 enough for WebKit. Only `--privileged` is, and that is a far wider grant than a
 job holding a `packages:write` token should have.
 
+### macOS: Gtk runs on a background thread, but Quartz wants the main one
+
+`GtkFixture` runs Gtk on a dedicated background thread and marshals every test
+body onto it. On Windows (win32) and Linux (X11 under Xvfb) that is fine. On
+macOS it is not: Homebrew's gtk4 is built `-Dmacos-backend=true
+-Dx11-backend=false` and GTK's broadway backend is off by default, so **Quartz is
+the only backend**. GDK-Quartz replaces the main context's poll function with one
+that calls Cocoa's `nextEventMatchingMask`, which aborts unless it runs on
+thread 0:
+
+```text
+*** Terminating app ... reason: 'nextEventMatchingMask should only be called from the Main Thread!'
+```
+
+Same truncated-"Passed!" shape as the others: the pure tests (GLib, Cairo,
+Graphene) that never open a `GdkDisplay` pass, then the first main-loop
+iteration after a window opens aborts the host — 24 of the suite, last seen.
+
+Under `dotnet test`/VSTest, thread 0 belongs to the test host, so the fixture
+cannot take it. The suite injects no real input events — it drives widgets,
+idles and timeouts — so `MacQuartzMainLoop.RestoreDefaultPollFunc` (called from
+the fixture after `Application.Init`, macOS only) points the default context's
+poll function back at plain `g_poll`. The loop then iterates off the main thread
+without touching AppKit, and GLib sources still fire.
+`QuartzMainLoopRegressionTests` pins the crash path: open a window, pump the
+loop.
+
 ---
 
 ## Why calling matters far more than compiling here

@@ -32,5 +32,11 @@ dotnet build Source/Tests/GtkSharp.Tests.MacRunner -c Release
 
 echo "== run the full suite on thread 0; the first Gtk call dogfoods the Homebrew install =="
 export GTKSHARP_TESTS_SKIP_WEBKIT=1
+# Software renderer: the headless window server never presents a GL frame, so a
+# shown window's frame clock stays waiting for one (gdk_frame_timings_presented:
+# skipped frame) and the next EventsPending/iteration blocks on it. The cairo
+# renderer presents frames in-process, so the frame clock settles.
+export GSK_RENDERER=cairo
+export GDK_DEBUG=gl-disable
 export GTKSHARP_BREW_PACKAGES="gtk4 gtksourceview5 libadwaita gsettings-desktop-schemas"
 dotnet exec BuildOutput/Tests/Release/MacRunner/GtkSharp.Tests.MacRunner.dll

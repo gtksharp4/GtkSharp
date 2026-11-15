@@ -34,6 +34,9 @@ namespace GtkSharp.Tests
             string[] candidates =
             {
                 "gobject-2.0-0.dll", "libgobject-2.0.so.0", "libgobject-2.0.0.dylib", "libgobject-2.0-0.dll",
+                // macOS Homebrew loads the dylib by full path, and a bare name is
+                // not on the dlopen search path; try the prefixes GLibrary uses.
+                "/opt/homebrew/lib/libgobject-2.0.0.dylib", "/usr/local/lib/libgobject-2.0.0.dylib",
             };
 
             foreach (var name in candidates)

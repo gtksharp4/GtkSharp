@@ -27,6 +27,25 @@ namespace GtkSharp.Tests
     {
         public SectionBrowsingTests(GtkFixture fixture) : base(fixture) { }
 
+        // Browsing mounts a section into the shown sample app and pumps the loop
+        // to settle it, which the headless macOS runner cannot do (Quartz blocks
+        // the iteration). Skip before the body so nothing is left half-mounted;
+        // the sections themselves are still constructed by SampleSectionTests, and
+        // browsing is covered on Windows and Linux.
+        const string MacSkip = "headless macOS cannot pump the main loop while browsing sections (Quartz frame-clock block).";
+
+        private new void Run(Action body)
+        {
+            Skip.If(TestEnvironment.IsMacOS, MacSkip);
+            base.Run(body);
+        }
+
+        private new T Run<T>(Func<T> body)
+        {
+            Skip.If(TestEnvironment.IsMacOS, MacSkip);
+            return base.Run(body);
+        }
+
         /// <summary>Every row the tree offers, with the category it sits under.</summary>
         public static IEnumerable<object[]> SectionRows()
         {
@@ -38,7 +57,7 @@ namespace GtkSharp.Tests
                 .OrderBy(row => (string) row[0]).ThenBy(row => (string) row[1]);
         }
 
-        [Fact]
+        [SkippableFact]
         public void The_tree_offers_a_row_for_every_section()
         {
             // Guards the theory: if the tree were empty, or stopped listing
@@ -80,7 +99,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Selecting_a_category_row_clears_the_content_pane()
         {
             // Categories are the parent rows. They map to no section, so the
@@ -105,7 +124,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Browsing_from_one_section_to_the_next_replaces_the_content()
         {
             // The pane must hold exactly one section at a time; a missed removal

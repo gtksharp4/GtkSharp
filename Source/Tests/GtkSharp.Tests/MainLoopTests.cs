@@ -18,10 +18,24 @@ namespace GtkSharp.Tests
 
         // Every test here drives idle/timeout/source dispatch through the main
         // loop, which the headless macOS runner cannot pump (Quartz blocks the
-        // iteration on a frame the window server never presents). The pump
-        // helpers below, and the loop.Run tests, gate on it. Covered on
-        // Windows and Linux.
+        // iteration on a frame the window server never presents). Skip before the
+        // body runs -- not just at the pump -- so no test leaves a source queued
+        // for a later test's loop to dispatch; one that throws from its handler
+        // escaped through the native dispatch and took the whole run down.
+        // Covered on Windows and Linux.
         const string MacSkip = "headless macOS cannot pump the main loop (Quartz frame-clock block).";
+
+        private new void Run(Action body)
+        {
+            Skip.If(TestEnvironment.IsMacOS, MacSkip);
+            base.Run(body);
+        }
+
+        private new T Run<T>(Func<T> body)
+        {
+            Skip.If(TestEnvironment.IsMacOS, MacSkip);
+            return base.Run(body);
+        }
 
         /// <summary>Runs pending main-loop work without blocking.</summary>
         private static void Drain()

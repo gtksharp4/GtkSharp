@@ -1,4 +1,14 @@
 <Project>
+  <!-- Chain up to Source/Directory.Build.props for the package-version split
+       (VersionPrefix/VersionSuffix). The per-template Directory.Build.Props
+       imports THIS file, which stops MSBuild's own walk-up here, so without this
+       import the version logic above never applies: VersionPrefix/VersionSuffix
+       stay empty and Net4x.NuGetUtility (Windows) rebuilds the version as a bare
+       ".", failing the pack with NU5024. -->
+  <PropertyGroup>
+    <ParentDirectoryBuildProps>$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))</ParentDirectoryBuildProps>
+  </PropertyGroup>
+  <Import Project="$(ParentDirectoryBuildProps)" Condition="'$(ParentDirectoryBuildProps)'!=''" />
   <PropertyGroup>
     <PackageType>Template</PackageType>
     <TargetFramework>netstandard2.0</TargetFramework>

@@ -43,6 +43,8 @@
         <_GtkSharpBaseVersion>4.22.4</_GtkSharpBaseVersion>
 		<!-- The C# language version to use for all projects. -->
 		<LangVersion>latest</LangVersion>
+		<!-- The C# ignore obsolete warnings for all projects. -->
+		<NoWarn>$(NoWarn);CS0612</NoWarn>
     </PropertyGroup>
     <!-- build.cake owns the package version: Init sets
 	     $(_GtkSharpBaseVersion).<yy><day-of-year> and passes it as -p:Version.

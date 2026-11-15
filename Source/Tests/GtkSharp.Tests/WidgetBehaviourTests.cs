@@ -20,6 +20,9 @@ namespace GtkSharp.Tests
         /// <summary>Lets Gtk settle the layout without showing anything.</summary>
         private static void Settle()
         {
+            Skip.If(TestEnvironment.IsMacOS,
+                    "headless macOS cannot pump the main loop to settle layout (Quartz frame-clock block).");
+
             var guard = 0;
             while (Gtk.Application.EventsPending() && guard++ < 1000)
                 Gtk.Application.RunIteration(false);
@@ -27,7 +30,7 @@ namespace GtkSharp.Tests
 
         // ------------------------------------------------------------ measuring
 
-        [Fact]
+        [SkippableFact]
         public void A_label_measures_wider_for_longer_text()
         {
             // Measure replaced GetPreferredWidth in Gtk 4 and takes an
@@ -49,7 +52,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_wrapping_label_measured_for_a_narrow_width_wants_more_height()
         {
             // The for-size argument is the whole point of Measure: height
@@ -66,7 +69,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_size_request_raises_the_measured_minimum()
         {
             Run(() =>
@@ -84,7 +87,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_box_measures_the_sum_of_its_children_plus_the_spacing()
         {
             Run(() =>
@@ -105,7 +108,7 @@ namespace GtkSharp.Tests
 
         // ------------------------------------------------------- the widget tree
 
-        [Fact]
+        [SkippableFact]
         public void A_box_reports_its_children_in_the_order_they_were_appended()
         {
             // GtkContainer is gone: children are a linked list on Widget now, so
@@ -124,7 +127,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Prepending_and_inserting_place_children_where_their_names_say()
         {
             Run(() =>
@@ -140,7 +143,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Removing_a_child_unparents_it_and_leaves_the_others()
         {
             Run(() =>
@@ -157,7 +160,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Reordering_a_child_moves_it_without_reparenting()
         {
             Run(() =>
@@ -174,7 +177,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Siblings_link_to_each_other_in_both_directions()
         {
             Run(() =>
@@ -192,7 +195,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_nested_widget_finds_the_ancestor_of_a_given_type()
         {
             Run(() =>
@@ -215,7 +218,7 @@ namespace GtkSharp.Tests
 
         // ---------------------------------------------------- event controllers
 
-        [Fact]
+        [SkippableFact]
         public void Activate_does_not_reach_a_click_handler_but_emitting_clicked_does()
         {
             // Gtk 4 routes presses through a gesture on the button rather than
@@ -241,7 +244,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_controller_added_to_a_widget_is_listed_on_it_and_can_be_removed()
         {
             Run(() =>
@@ -259,7 +262,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_key_controller_reports_the_key_that_was_delivered_to_it()
         {
             Run(() =>
@@ -294,7 +297,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void An_entry_delegates_keys_to_an_internal_text_child()
         {
             // Half of why a key controller on an Entry never fires: the Entry is
@@ -316,7 +319,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_controller_propagates_in_the_bubble_phase_unless_told_otherwise()
         {
             // The other half. Bubble runs from the event's target outwards, so
@@ -341,7 +344,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_shortcut_controller_holds_the_shortcuts_added_to_it()
         {
             Run(() =>
@@ -357,7 +360,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_control_s_trigger_prints_back_as_the_string_it_was_parsed_from()
         {
             Run(() =>
@@ -371,7 +374,7 @@ namespace GtkSharp.Tests
 
         // ------------------------------------------------------------------ CSS
 
-        [Fact]
+        [SkippableFact]
         public void A_css_class_added_to_a_widget_is_reported_back()
         {
             Run(() =>
@@ -391,7 +394,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Css_classes_can_be_replaced_wholesale()
         {
             Run(() =>
@@ -405,7 +408,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_widget_reports_the_css_name_of_its_type()
         {
             Run(() =>
@@ -416,7 +419,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_css_provider_parses_valid_css_and_reports_errors_in_bad_css()
         {
             // The parsing-error signal is the only way to learn that a stylesheet
@@ -455,7 +458,7 @@ namespace GtkSharp.Tests
 
         // ------------------------------------------------------------ visibility
 
-        [Fact]
+        [SkippableFact]
         public void Visibility_and_sensitivity_round_trip_and_compose()
         {
             Run(() =>
@@ -480,7 +483,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Expansion_and_alignment_round_trip()
         {
             Run(() =>
@@ -504,7 +507,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_widget_reports_the_direction_it_was_given()
         {
             Run(() =>
@@ -521,7 +524,7 @@ namespace GtkSharp.Tests
 
         // ------------------------------------------------------ layout managers
 
-        [Fact]
+        [SkippableFact]
         public void A_grid_places_children_at_the_coordinates_it_was_given()
         {
             Run(() =>
@@ -539,7 +542,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_grid_reports_the_position_and_span_of_a_child()
         {
             Run(() =>
@@ -558,7 +561,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_widget_reports_the_layout_manager_its_type_uses()
         {
             Run(() =>

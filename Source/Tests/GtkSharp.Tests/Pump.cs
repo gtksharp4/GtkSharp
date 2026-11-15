@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using Xunit;
 
 namespace GtkSharp.Tests
 {
@@ -19,9 +20,16 @@ namespace GtkSharp.Tests
     /// </remarks>
     internal static class Pump
     {
+        // Iterating the main loop blocks on the headless macOS runner (Quartz
+        // waits on a frame the window server never presents), so a caller that
+        // needs the loop pumped cannot run there.
+        const string MacSkip = "headless macOS cannot pump the main loop (Quartz frame-clock block).";
+
         /// <summary>Pumps the main loop for <paramref name="milliseconds"/>.</summary>
         public static void For(int milliseconds)
         {
+            Skip.If(TestEnvironment.IsMacOS, MacSkip);
+
             var clock = Stopwatch.StartNew();
             while (clock.ElapsedMilliseconds < milliseconds)
             {
@@ -36,6 +44,8 @@ namespace GtkSharp.Tests
         /// </summary>
         public static bool Until(Func<bool> done, int milliseconds = 5000)
         {
+            Skip.If(TestEnvironment.IsMacOS, MacSkip);
+
             var clock = Stopwatch.StartNew();
             while (!done() && clock.ElapsedMilliseconds < milliseconds)
             {

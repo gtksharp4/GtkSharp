@@ -43,7 +43,7 @@ namespace GtkSharp.Tests
 
         // ------------------------------------------------------------- Bitset
 
-        [Fact]
+        [SkippableFact]
         public void A_bitset_holds_the_values_added_to_it_and_no_others()
         {
             Run(() =>
@@ -68,7 +68,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Removing_from_a_bitset_reports_whether_anything_went()
         {
             Run(() =>
@@ -89,7 +89,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Bitset_union_intersection_and_difference_are_the_set_operations()
         {
             // Arithmetic the test can do itself, which is the point: the oracle
@@ -118,7 +118,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_copied_bitset_does_not_change_when_the_original_does()
         {
             Run(() =>
@@ -135,7 +135,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Shifting_a_bitset_moves_every_value_by_the_same_amount()
         {
             Run(() =>
@@ -162,7 +162,7 @@ namespace GtkSharp.Tests
             return items;
         }
 
-        [Fact]
+        [SkippableFact]
         public void Splicing_nothing_out_is_a_pure_insertion()
         {
             // This is the call that used to destroy data. gtk_string_list_splice
@@ -183,7 +183,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Splicing_replaces_exactly_the_rows_it_was_told_to()
         {
             Run(() =>
@@ -196,7 +196,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Splicing_with_no_additions_only_removes()
         {
             Run(() =>
@@ -209,7 +209,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_splice_reports_one_change_covering_both_halves()
         {
             // A view rebuilds from these arguments, so the removal and the
@@ -241,7 +241,7 @@ namespace GtkSharp.Tests
 
         // --------------------------------------------------- selection models
 
-        [Fact]
+        [SkippableFact]
         public void A_single_selection_selects_one_row_and_reports_it_three_ways()
         {
             Run(() =>
@@ -260,7 +260,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Emptying_a_single_selection_takes_both_of_its_flags()
         {
             // Two independent guards, and knowing only about one is a trap: I
@@ -294,7 +294,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void An_empty_single_selection_reports_the_invalid_position()
         {
             // GTK_INVALID_LIST_POSITION is a <constant> in the gir, which
@@ -318,7 +318,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_multi_selection_holds_as_many_rows_as_it_is_given()
         {
             Run(() =>
@@ -347,7 +347,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Selecting_with_unselect_rest_replaces_the_selection()
         {
             Run(() =>
@@ -363,7 +363,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_no_selection_model_never_selects_anything()
         {
             // The wrapper a read-only list uses. It still has to be a selection
@@ -383,7 +383,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_selection_model_passes_the_underlying_model_through()
         {
             Run(() =>
@@ -400,7 +400,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Adding_to_the_source_tells_the_selection_model_what_changed()
         {
             // ItemsChanged is how a view knows which rows to rebuild. The
@@ -433,7 +433,7 @@ namespace GtkSharp.Tests
 
         // ------------------------------------------------------------ ListView
 
-        [Fact]
+        [SkippableFact]
         public void A_list_view_keeps_the_model_and_factory_it_was_built_with()
         {
             Run(() =>
@@ -448,7 +448,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_list_view_builds_a_row_widget_for_each_visible_item()
         {
             // Setup creates the row widget once and Bind fills it in, possibly
@@ -496,7 +496,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_bound_row_knows_its_position_in_the_model()
         {
             Run(() =>
@@ -527,7 +527,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Replacing_a_list_views_model_rebinds_it_to_the_new_one()
         {
             Run(() =>
@@ -561,7 +561,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_row_reports_whether_it_is_the_selected_one()
         {
             Run(() =>
@@ -591,7 +591,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Unbind_runs_when_a_row_widget_is_recycled_away()
         {
             // The half people forget: anything Bind attaches -- a signal handler,
@@ -628,6 +628,9 @@ namespace GtkSharp.Tests
 
         static bool PumpUntil(Func<bool> condition, int timeoutMs = 5000)
         {
+            Skip.If(TestEnvironment.IsMacOS,
+                    "headless macOS cannot pump the main loop for row recycling (Quartz frame-clock block).");
+
             var clock = System.Diagnostics.Stopwatch.StartNew();
             while (!condition() && clock.ElapsedMilliseconds < timeoutMs)
             {

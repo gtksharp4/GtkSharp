@@ -17,6 +17,9 @@ namespace GtkSharp.Tests
     {
         public PixbufAndLogTests(GtkFixture fixture) : base(fixture) { }
 
+        const string MacLoopSkip =
+            "headless macOS cannot pump the main loop for idle/timeout dispatch (Quartz frame-clock block).";
+
         /// <summary>A pixbuf with one known pixel per corner.</summary>
         private static Gdk.Pixbuf Painted(int width = 8, int height = 8)
         {
@@ -35,7 +38,7 @@ namespace GtkSharp.Tests
 
         // ------------------------------------------------------------ geometry
 
-        [Fact]
+        [SkippableFact]
         public void A_pixbuf_reports_the_geometry_it_was_created_with()
         {
             Run(() =>
@@ -51,7 +54,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_pixbuf_without_alpha_has_three_channels()
         {
             Run(() =>
@@ -63,7 +66,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Adding_alpha_makes_the_substituted_colour_transparent()
         {
             Run(() =>
@@ -81,7 +84,7 @@ namespace GtkSharp.Tests
 
         // -------------------------------------------------------------- pixels
 
-        [Fact]
+        [SkippableFact]
         public void Filling_writes_the_colour_across_every_pixel()
         {
             Run(() =>
@@ -93,7 +96,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Copying_an_area_moves_the_pixels_it_names()
         {
             Run(() =>
@@ -111,7 +114,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_subpixbuf_shares_the_pixels_of_the_region_it_names()
         {
             Run(() =>
@@ -132,7 +135,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Scaling_produces_the_size_asked_for_and_keeps_the_colour()
         {
             Run(() =>
@@ -147,7 +150,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Flipping_and_rotating_move_the_pixels_where_the_names_say()
         {
             Run(() =>
@@ -167,7 +170,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_clone_is_independent_of_the_pixbuf_it_came_from()
         {
             Run(() =>
@@ -186,7 +189,7 @@ namespace GtkSharp.Tests
 
         // ----------------------------------------------------- encode / decode
 
-        [Fact]
+        [SkippableFact]
         public void The_supported_formats_include_png()
         {
             Run(() =>
@@ -197,7 +200,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_pixbuf_saved_to_a_buffer_loads_back_with_the_same_pixels()
         {
             // PNG is lossless, so this is an exact comparison rather than a
@@ -221,7 +224,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_pixbuf_saved_to_a_file_loads_back_from_it()
         {
             Run(() =>
@@ -248,7 +251,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Loading_from_a_file_at_a_size_scales_while_loading()
         {
             Run(() =>
@@ -273,7 +276,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_pixbuf_reads_back_from_a_managed_stream()
         {
             Run(() =>
@@ -290,7 +293,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Loading_something_that_is_not_an_image_raises_rather_than_returning_junk()
         {
             Run(() =>
@@ -301,7 +304,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Saving_in_an_unknown_format_raises()
         {
             Run(() =>
@@ -314,7 +317,7 @@ namespace GtkSharp.Tests
 
         // ----------------------------------------------------------- GLib.Log
 
-        [Fact]
+        [SkippableFact]
         public void A_log_handler_receives_the_domain_level_and_message()
         {
             Run(() =>
@@ -344,7 +347,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_removed_log_handler_stops_being_called()
         {
             Run(() =>
@@ -364,7 +367,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_handler_only_hears_the_levels_it_asked_for()
         {
             Run(() =>
@@ -389,9 +392,10 @@ namespace GtkSharp.Tests
 
         // -------------------------------------------------------- GLib.Source
 
-        [Fact]
+        [SkippableFact]
         public void An_idle_handler_runs_and_stops_when_it_returns_false()
         {
+            Skip.If(TestEnvironment.IsMacOS, MacLoopSkip);
             Run(() =>
             {
                 var calls = 0;
@@ -406,9 +410,10 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void An_idle_handler_that_returns_true_runs_again()
         {
+            Skip.If(TestEnvironment.IsMacOS, MacLoopSkip);
             Run(() =>
             {
                 var calls = 0;
@@ -422,9 +427,10 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Removing_a_source_by_its_id_stops_it_running()
         {
+            Skip.If(TestEnvironment.IsMacOS, MacLoopSkip);
             Run(() =>
             {
                 var calls = 0;
@@ -440,9 +446,10 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_timeout_runs_once_the_main_loop_has_waited_long_enough()
         {
+            Skip.If(TestEnvironment.IsMacOS, MacLoopSkip);
             Run(() =>
             {
                 var calls = 0;

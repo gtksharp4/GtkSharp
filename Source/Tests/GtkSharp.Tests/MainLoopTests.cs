@@ -16,9 +16,18 @@ namespace GtkSharp.Tests
     {
         public MainLoopTests(GtkFixture fixture) : base(fixture) { }
 
+        // Every test here drives idle/timeout/source dispatch through the main
+        // loop, which the headless macOS runner cannot pump (Quartz blocks the
+        // iteration on a frame the window server never presents). The pump
+        // helpers below, and the loop.Run tests, gate on it. Covered on
+        // Windows and Linux.
+        const string MacSkip = "headless macOS cannot pump the main loop (Quartz frame-clock block).";
+
         /// <summary>Runs pending main-loop work without blocking.</summary>
         private static void Drain()
         {
+            Skip.If(TestEnvironment.IsMacOS, MacSkip);
+
             var guard = 0;
             while (Gtk.Application.EventsPending() && guard++ < 10000)
                 Gtk.Application.RunIteration(false);
@@ -40,6 +49,8 @@ namespace GtkSharp.Tests
         /// </remarks>
         private static void Quiesce()
         {
+            Skip.If(TestEnvironment.IsMacOS, MacSkip);
+
             // Capped, because a source that stays ready -- an idle returning
             // true -- would otherwise dispatch forever and hang the run rather
             // than fail it.
@@ -53,6 +64,8 @@ namespace GtkSharp.Tests
         /// <summary>Blocks until <paramref name="done"/> or the deadline.</summary>
         private static void PumpUntil(Func<bool> done, int milliseconds = 5000)
         {
+            Skip.If(TestEnvironment.IsMacOS, MacSkip);
+
             var clock = Stopwatch.StartNew();
             while (!done() && clock.ElapsedMilliseconds < milliseconds)
                 Gtk.Application.RunIteration(true);
@@ -60,7 +73,7 @@ namespace GtkSharp.Tests
 
         // --------------------------------------------------------- priorities
 
-        [Fact]
+        [SkippableFact]
         public void A_higher_priority_idle_runs_before_a_lower_priority_one()
         {
             // This is the whole reason the priority overloads exist, and it is
@@ -78,7 +91,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void An_integer_priority_orders_the_same_way_the_enum_does()
         {
             Run(() =>
@@ -96,7 +109,7 @@ namespace GtkSharp.Tests
 
         // ------------------------------------------------------------- idles
 
-        [Fact]
+        [SkippableFact]
         public void An_idle_returning_false_runs_exactly_once_however_long_the_loop_turns()
         {
             Run(() =>
@@ -112,7 +125,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void An_idle_can_stop_itself_after_a_chosen_number_of_runs()
         {
             Run(() =>
@@ -127,7 +140,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Removing_an_idle_by_id_stops_it_before_it_ever_runs()
         {
             Run(() =>
@@ -143,7 +156,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Removing_a_source_that_is_already_gone_reports_that_it_was_not_found()
         {
             Run(() =>
@@ -157,7 +170,7 @@ namespace GtkSharp.Tests
 
         // ---------------------------------------------------------- timeouts
 
-        [Fact]
+        [SkippableFact]
         public void A_timeout_runs_after_its_interval_and_stops_when_it_returns_false()
         {
             Run(() =>
@@ -173,7 +186,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_repeating_timeout_runs_until_it_says_to_stop()
         {
             Run(() =>
@@ -188,7 +201,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_shorter_timeout_fires_before_a_longer_one()
         {
             Run(() =>
@@ -204,7 +217,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Removing_a_timeout_stops_it_firing()
         {
             Run(() =>
@@ -221,7 +234,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_timeout_handler_that_throws_does_not_stop_the_loop()
         {
             // A managed exception cannot cross back into C, so the binding hands
@@ -254,7 +267,7 @@ namespace GtkSharp.Tests
 
         // ------------------------------------------------------- MainContext
 
-        [Fact]
+        [SkippableFact]
         public void The_default_context_reports_whether_work_is_waiting()
         {
             Run(() =>
@@ -273,9 +286,10 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Iterating_the_context_dispatches_one_pending_source()
         {
+            Skip.If(TestEnvironment.IsMacOS, MacSkip);
             Run(() =>
             {
                 Quiesce();
@@ -291,7 +305,7 @@ namespace GtkSharp.Tests
 
         // ------------------------------------------------------ GLib.Source
 
-        [Fact]
+        [SkippableFact]
         public void A_source_can_be_found_by_the_id_it_was_given()
         {
             // Idle.Add and Timeout.Add return an id and GLib.Source has the
@@ -316,7 +330,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_source_reports_the_priority_and_name_it_was_given()
         {
             Run(() =>
@@ -341,7 +355,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Destroying_a_source_marks_it_destroyed_and_stops_it_running()
         {
             Run(() =>
@@ -362,7 +376,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_source_reports_the_context_it_is_attached_to()
         {
             Run(() =>
@@ -382,7 +396,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void CanRecurse_is_reported_back_as_it_was_set()
         {
             Run(() =>
@@ -407,9 +421,10 @@ namespace GtkSharp.Tests
 
         // -------------------------------------------------------- MainLoop
 
-        [Fact]
+        [SkippableFact]
         public void A_main_loop_runs_until_something_quits_it()
         {
+            Skip.If(TestEnvironment.IsMacOS, MacSkip);
             // Application.Run is built on this, and it is what replaced gtk_main
             // in the Gtk 4 port -- so it is worth a test that actually enters
             // and leaves a loop rather than trusting the shape of the code.
@@ -434,9 +449,10 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_main_loop_reports_that_it_is_running_from_inside_itself()
         {
+            Skip.If(TestEnvironment.IsMacOS, MacSkip);
             Run(() =>
             {
                 var loop = new GLib.MainLoop();

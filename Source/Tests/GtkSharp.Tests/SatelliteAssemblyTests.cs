@@ -61,6 +61,9 @@ namespace GtkSharp.Tests
         /// </summary>
         private static bool PumpUntil(Func<bool> condition, int timeoutMs = 3000)
         {
+            Skip.If(TestEnvironment.IsMacOS,
+                    "headless macOS cannot pump the main loop (Quartz frame-clock block).");
+
             var clock = Stopwatch.StartNew();
             while (!condition() && clock.ElapsedMilliseconds < timeoutMs)
             {
@@ -118,7 +121,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Node_bounds_compose_the_way_the_operations_describe()
         {
             // Every node computes its bounds from its children's, so this is
@@ -181,7 +184,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_node_written_to_a_file_is_the_bytes_serialize_produced()
         {
             // The oracle is outside GSK entirely: what the test read back off
@@ -254,7 +257,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_transform_builder_does_not_consume_the_transform_it_was_called_on()
         {
             // All twelve GskTransform builders take their receiver as
@@ -323,7 +326,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_transform_maps_points_and_rectangles_by_its_own_arithmetic()
         {
             // GSK composes right-to-left: the last operation added is applied to
@@ -397,7 +400,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Transform_categories_narrow_as_the_operations_do()
         {
             // The enum runs from Unknown up to Identity, so "more specific" is a
@@ -424,7 +427,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_transform_parses_back_from_the_form_it_prints()
         {
             // gsk_transform_parse is documented as the inverse of
@@ -449,7 +452,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_path_builder_survives_being_drained_into_a_path()
         {
             // gsk_path_builder_free_to_path frees the builder outright, the same
@@ -506,7 +509,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void The_rounded_rect_struct_lays_its_twelve_floats_out_the_way_gsk_reads_them()
         {
             // This test used to assert the opposite, and said so: "written to fail
@@ -560,7 +563,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_rounded_rect_reads_back_what_gsk_wrote_into_it()
         {
             // The layout test above says the bytes are in the right places; this
@@ -592,7 +595,7 @@ namespace GtkSharp.Tests
 
         // ========================================================== GtkSource
 
-        [Fact]
+        [SkippableFact]
         public void The_language_manager_guesses_a_language_from_a_file_name()
         {
             // Guessing is what an editor actually does on open; GetLanguage by id
@@ -613,7 +616,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_language_lists_the_globs_and_style_ids_it_claims()
         {
             // Three string arrays off the same object, which is where a lost
@@ -641,7 +644,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Sorting_lines_orders_them_and_leaves_a_trailing_newline_behind()
         {
             // The ordering oracle is ordinal string comparison, not GtkSourceView:
@@ -681,7 +684,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Changing_case_and_joining_lines_do_what_the_names_say()
         {
             Run(() =>
@@ -704,7 +707,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_search_context_counts_every_occurrence_and_honours_case()
         {
             // Occurrence counting is scheduled on an idle and reports -1 while it
@@ -732,7 +735,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Searching_forward_lands_on_the_offsets_the_test_put_the_matches_at()
         {
             Run(() =>
@@ -765,7 +768,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_regex_search_replaces_every_match_and_says_how_many()
         {
             // ReplaceAll's return value is the count, so the buffer's text and
@@ -791,7 +794,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Highlighting_marks_a_comment_as_a_comment()
         {
             // Context classes are the only view GtkSourceView offers onto the
@@ -827,7 +830,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_region_keeps_what_was_added_and_drops_what_was_subtracted()
         {
             // GtkSource.Region is set arithmetic over buffer offsets, so the
@@ -875,7 +878,7 @@ namespace GtkSharp.Tests
             return found;
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_snippet_context_expands_one_reference_and_is_not_a_template_engine()
         {
             // "Expand" reads like string interpolation. It is not: the input has
@@ -920,7 +923,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_snippet_context_knows_the_date_without_being_told_it()
         {
             // The oracle is the calendar rather than GtkSourceView. These are the
@@ -945,7 +948,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_snippet_keeps_the_chunks_it_was_given_in_order()
         {
             Run(() =>
@@ -982,7 +985,7 @@ namespace GtkSharp.Tests
 
         // ============================================================ Adwaita
 
-        [Fact]
+        [SkippableFact]
         public void A_navigation_view_pops_back_to_the_page_it_was_pushed_from()
         {
             Run(() =>
@@ -1011,7 +1014,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Replacing_the_navigation_stack_leaves_the_last_page_visible()
         {
             // adw_navigation_view_replace takes AdwNavigationPage ** plus a count
@@ -1044,7 +1047,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Replacing_by_tag_finds_the_pages_that_were_added_to_the_view()
         {
             // Add() puts a page in the view's pool without showing it, which is
@@ -1092,7 +1095,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_view_stack_page_carries_the_title_its_child_was_added_with()
         {
             Run(() =>
@@ -1125,7 +1128,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Dismissing_a_toast_tells_whoever_was_listening()
         {
             // A toast is one-shot: the overlay owns it after AddToast and the
@@ -1150,7 +1153,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void The_style_manager_reports_dark_when_the_scheme_forces_it()
         {
             // ColorScheme is what an application sets and Dark is what it reads
@@ -1200,7 +1203,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Spring_params_derive_damping_from_the_ratio_mass_and_stiffness()
         {
             // damping = damping_ratio * 2 * sqrt (mass * stiffness) is physics,
@@ -1220,7 +1223,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_breakpoint_condition_parses_back_from_the_form_it_prints()
         {
             // Breakpoint conditions arrive from .ui files as strings, so parse and
@@ -1242,7 +1245,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_banner_and_a_status_page_compose_a_child_and_keep_their_text()
         {
             // Both wrap their content in internal widgetry, so "the child came

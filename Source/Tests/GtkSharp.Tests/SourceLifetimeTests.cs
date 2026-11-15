@@ -23,6 +23,9 @@ namespace GtkSharp.Tests
 
         static bool PumpUntil(Func<bool> condition, int timeoutMs = 3000)
         {
+            Skip.If(TestEnvironment.IsMacOS,
+                    "headless macOS cannot pump the main loop for source dispatch (Quartz frame-clock block).");
+
             var clock = System.Diagnostics.Stopwatch.StartNew();
             while (!condition() && clock.ElapsedMilliseconds < timeoutMs)
             {
@@ -47,7 +50,7 @@ namespace GtkSharp.Tests
 
         // ------------------------------------------------------------ ready time
 
-        [Fact]
+        [SkippableFact]
         public void Setting_the_ready_time_to_now_fires_a_timeout_that_had_not_come_due()
         {
             // ReadyTime overrides the source's own scheduling: zero means "ready
@@ -68,7 +71,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_ready_time_in_the_future_does_not_fire_yet()
         {
             // The control. Without it, the test above could be reporting a
@@ -91,7 +94,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void The_ready_time_reads_back_as_it_was_set()
         {
             Run(() =>
@@ -108,7 +111,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_sources_time_advances_with_the_loop()
         {
             // g_source_get_time is the monotonic clock the loop caches per
@@ -132,7 +135,7 @@ namespace GtkSharp.Tests
 
         // --------------------------------------------------------- child sources
 
-        [Fact]
+        [SkippableFact]
         public void A_child_source_cannot_be_attached_because_none_can_be_made()
         {
             // AddChildSource is bound and works in C, and is unreachable here.
@@ -162,7 +165,7 @@ namespace GtkSharp.Tests
 
         // ------------------------------------------- the constructor that cannot
 
-        [Fact]
+        [SkippableFact]
         public void Building_a_source_from_SourceFuncs_refuses_rather_than_corrupting_the_loop()
         {
             // GLib.SourceFuncs binds only closure_callback and closure_marshal.
@@ -187,7 +190,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void The_other_two_vtable_members_refuse_for_the_same_reason()
         {
             // A struct-layout audit over every hand-written sequential struct
@@ -215,7 +218,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void The_sources_GLib_makes_for_you_still_work()
         {
             // The counterpart to the refusal above: the supported route has to

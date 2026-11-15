@@ -26,6 +26,9 @@ namespace GtkSharp.Tests
         /// so a test can wait on an idle callback rather than guess a sleep.</summary>
         static bool PumpUntil(Func<bool> condition, int timeoutMs = 3000)
         {
+            Skip.If(TestEnvironment.IsMacOS,
+                    "headless macOS cannot pump the main loop for a cross-thread notify (Quartz frame-clock block).");
+
             var clock = System.Diagnostics.Stopwatch.StartNew();
             while (!condition() && clock.ElapsedMilliseconds < timeoutMs)
             {
@@ -38,7 +41,7 @@ namespace GtkSharp.Tests
             return condition();
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_wakeup_from_another_thread_runs_the_delegate_on_the_gtk_thread()
         {
             // The whole point of ThreadNotify: Gtk may only be touched from the
@@ -75,7 +78,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Several_wakeups_before_the_loop_runs_collapse_into_one_call()
         {
             // The reason ThreadNotify exists rather than a bare Idle.Add: a
@@ -101,7 +104,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_wakeup_after_the_delegate_has_run_is_delivered_again()
         {
             // Coalescing must not latch: the flag is cleared as the delegate is
@@ -120,7 +123,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Closing_a_notifier_stops_a_wakeup_already_in_flight()
         {
             // Close is what an application calls while shutting down, quite
@@ -181,7 +184,7 @@ namespace GtkSharp.Tests
             return (false, 0, 0, 0, 0);
         }
 
-        [Fact]
+        [SkippableFact]
         public void Rendering_a_background_paints_the_colour_the_css_asked_for()
         {
             // gtk_render_background still exists in Gtk 4 (deprecated since
@@ -202,7 +205,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Rendering_a_background_of_nothing_paints_nothing()
         {
             // The contrast that makes the test above mean something: with a
@@ -220,7 +223,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Rendering_a_frame_paints_the_border_the_css_asked_for()
         {
             Run(() =>
@@ -239,7 +242,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_frame_with_no_border_width_paints_nothing()
         {
             Run(() =>
@@ -254,7 +257,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Rendering_a_line_paints_between_the_two_points()
         {
             Run(() =>
@@ -269,7 +272,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Rendering_a_layout_paints_the_text_and_an_empty_one_paints_nothing()
         {
             // gtk_render_layout is how a custom widget draws text through the
@@ -299,7 +302,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_provider_added_at_a_higher_priority_wins()
         {
             // Which of two rules applies is the question a stylesheet actually
@@ -329,7 +332,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Removing_a_provider_takes_its_styling_with_it()
         {
             Run(() =>

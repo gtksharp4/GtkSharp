@@ -41,6 +41,8 @@
 		     the same string in its baseVersion constant; the two have to move
 		     together when the bound Gtk changes. -->
         <_GtkSharpBaseVersion>4.22.4</_GtkSharpBaseVersion>
+		<!-- The C# language version to use for all projects. -->
+		<LangVersion>latest</LangVersion>
     </PropertyGroup>
     <!-- build.cake owns the package version: Init sets
 	     $(_GtkSharpBaseVersion).<yy><day-of-year> and passes it as -p:Version.

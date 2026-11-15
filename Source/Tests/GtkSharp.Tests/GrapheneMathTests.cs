@@ -1104,13 +1104,7 @@ namespace GtkSharp.Tests
 
                 // The queued frees are on a 50 ms timeout, so the loop has to
                 // turn for longer than that before any of them has run.
-                var clock = System.Diagnostics.Stopwatch.StartNew();
-                while (clock.ElapsedMilliseconds < 250)
-                {
-                    while (Gtk.Application.EventsPending())
-                        Gtk.Application.RunIteration(false);
-                    System.Threading.Thread.Sleep(1);
-                }
+                Pump.For(250);
 
                 // Surviving is not the assertion -- a corrupted heap does not
                 // always fault at once. The assertion is that graphene still

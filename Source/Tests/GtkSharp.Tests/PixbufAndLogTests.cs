@@ -451,9 +451,7 @@ namespace GtkSharp.Tests
 
                 // Blocking iterations, so the loop waits for the timer rather
                 // than spinning past it.
-                var deadline = System.Diagnostics.Stopwatch.StartNew();
-                while (calls == 0 && deadline.ElapsedMilliseconds < 2000)
-                    Gtk.Application.RunIteration(true);
+                Pump.Until(() => calls > 0, 2000);
 
                 Assert.Equal(1, calls);
             });

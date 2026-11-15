@@ -947,10 +947,7 @@ namespace GtkSharp.Tests
                     // The generated finalizer does not unref: it queues the
                     // unref onto the main loop with a 50 ms timeout, so a double
                     // free only surfaces once the loop has run.
-                    var deadline = System.Diagnostics.Stopwatch.StartNew();
-                    while (deadline.ElapsedMilliseconds < 400)
-                        if (Gtk.Application.EventsPending())
-                            Gtk.Application.RunIteration(false);
+                    Pump.For(400);
                 }
                 finally
                 {

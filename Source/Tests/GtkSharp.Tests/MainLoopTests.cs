@@ -215,9 +215,7 @@ namespace GtkSharp.Tests
                 GLib.Timeout.Remove(id);
 
                 // Long enough that it would certainly have fired.
-                var clock = Stopwatch.StartNew();
-                while (clock.ElapsedMilliseconds < 60)
-                    Drain();
+                Pump.For(60);
 
                 Assert.Equal(0, calls);
             });

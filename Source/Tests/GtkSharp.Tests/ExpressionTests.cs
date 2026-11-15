@@ -620,10 +620,7 @@ namespace GtkSharp.Tests
                     GC.WaitForPendingFinalizers();
                     GC.Collect();
 
-                    var deadline = Stopwatch.StartNew();
-                    while (deadline.ElapsedMilliseconds < 400)
-                        if (Application.EventsPending())
-                            Application.RunIteration(false);
+                    Pump.For(400);
                 }
                 finally
                 {

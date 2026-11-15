@@ -243,6 +243,15 @@ namespace GLib {
 
 			return false;
 		}
+
+		// Runs the unrefs and GC-handle frees QueueUnref/QueueGCHandleFree have
+		// queued onto the main loop, synchronously on the calling thread. See
+		// GLib.Object.RunPendingFrees.
+		internal static void RunPendingFrees ()
+		{
+			PerformQueuedUnrefs ();
+			PerformGCHandleFrees ();
+		}
 		[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 		delegate void d_g_object_add_toggle_ref(IntPtr raw, ToggleNotifyHandler notify_cb, IntPtr data);
 		static d_g_object_add_toggle_ref g_object_add_toggle_ref = FuncLoader.LoadFunction<d_g_object_add_toggle_ref>(FuncLoader.GetProcAddress(GLibrary.Load(Library.GObject), "g_object_add_toggle_ref"));

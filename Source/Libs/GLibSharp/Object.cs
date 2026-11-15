@@ -1018,6 +1018,24 @@ namespace GLib {
 			return false;
 		}
 
+		/// <summary>
+		/// Runs every deferred free that object finalizers have queued -- signal
+		/// disconnects, toggle-ref unrefs and GC-handle frees -- synchronously,
+		/// rather than waiting for the main loop to dispatch them.
+		/// </summary>
+		/// <remarks>
+		/// A finalizer cannot touch GObject from the finalizer thread, so it queues
+		/// the work onto the main loop (a 50 ms timeout) instead. Call this on the
+		/// thread that owns Gtk, after forcing a collection, when those frees must
+		/// have happened by a known point -- a deterministic teardown, or a test --
+		/// without iterating the loop.
+		/// </remarks>
+		public static void RunPendingFrees ()
+		{
+			PerformQueuedSignalFrees ();
+			ToggleRef.RunPendingFrees ();
+		}
+
 		protected static void OverrideVirtualMethod (GType gtype, string name, Delegate cb)
 		{
 			Signal.OverrideDefaultHandler (gtype, name, cb);

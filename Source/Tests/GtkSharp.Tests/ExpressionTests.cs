@@ -619,8 +619,14 @@ namespace GtkSharp.Tests
                     GC.Collect();
                     GC.WaitForPendingFinalizers();
                     GC.Collect();
+                    GC.WaitForPendingFinalizers();
 
-                    Pump.For(400);
+                    // The finalizers queued the second frees onto the main loop.
+                    // Run them here rather than pumping the loop: the headless
+                    // macOS runner's Quartz loop cannot be pumped, and this is
+                    // deterministic -- if the double-free regressed, it surfaces
+                    // now as a GLib critical in complaints.
+                    GLib.Object.RunPendingFrees();
                 }
                 finally
                 {

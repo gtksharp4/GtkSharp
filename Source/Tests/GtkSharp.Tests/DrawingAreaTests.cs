@@ -122,6 +122,13 @@ namespace GtkSharp.Tests
         /// <paramref name="draw"/> installed.</summary>
         static ShownWindow Shown(Gtk.DrawingArea area, Gtk.DrawingAreaDrawFunc draw, int size = 16)
         {
+            // Every test that shows a DrawingArea and then waits for its draw or
+            // resize hangs on the headless macOS runner: the window server never
+            // advances the frame clock, so the draw function is never called and
+            // the wait blocks the Gtk thread. Covered on Windows and Linux.
+            Skip.If(TestEnvironment.IsMacOS,
+                    "headless macOS does not advance a shown DrawingArea's frame clock.");
+
             area.ContentWidth = size;
             area.ContentHeight = size;
             area.DrawFunc = draw;
@@ -135,7 +142,7 @@ namespace GtkSharp.Tests
 
         // ------------------------------------------------------- the draw call
 
-        [Fact]
+        [SkippableFact]
         public void The_draw_function_is_handed_the_area_and_the_size_it_was_given()
         {
             // Four marshalled arguments, and three of them have been wrong in this
@@ -177,7 +184,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void What_the_draw_function_paints_is_what_the_widget_renders()
         {
             // The end-to-end assertion: a managed delegate, called from native
@@ -206,7 +213,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_draw_function_that_paints_nothing_leaves_the_widget_empty()
         {
             // The control. Without it, "the pixel is red" could be reporting the
@@ -227,7 +234,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Replacing_the_draw_function_replaces_what_is_drawn()
         {
             // The second delegate has to reach Gtk *and* the first has to stop
@@ -275,7 +282,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Queueing_a_draw_asks_for_the_function_to_run_again()
         {
             Run(() =>
@@ -297,7 +304,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void The_content_size_is_the_size_the_area_asks_for()
         {
             // ContentWidth/Height are what a drawing area reports as its natural
@@ -320,12 +327,6 @@ namespace GtkSharp.Tests
         [SkippableFact]
         public void Resizing_the_area_announces_the_new_size()
         {
-            // Hangs on the headless macOS runner: presenting the area and waiting
-            // for its frame-clock-driven resize/redraw blocks the Gtk thread,
-            // which the CI window server never advances. Covered on Windows/Linux.
-            Skip.If(TestEnvironment.IsMacOS,
-                    "headless macOS does not advance the frame clock; the resize never arrives.");
-
             Run(() =>
             {
                 var area = new Gtk.DrawingArea();
@@ -352,7 +353,7 @@ namespace GtkSharp.Tests
 
         // ------------------------------------------- drawing through the context
 
-        [Fact]
+        [SkippableFact]
         public void The_draw_function_can_use_the_full_cairo_api_on_the_context_it_is_given()
         {
             // The context is Gtk's, wrapped rather than constructed here, so the
@@ -384,7 +385,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void A_clip_set_by_the_draw_function_is_honoured()
         {
             Run(() =>
@@ -412,7 +413,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Text_drawn_through_pango_reaches_the_widget_too()
         {
             // The other half of custom drawing: Pango lays the text out, Cairo
@@ -448,7 +449,7 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Drawing_nothing_but_text_that_is_empty_leaves_no_ink()
         {
             // The control for the test above.

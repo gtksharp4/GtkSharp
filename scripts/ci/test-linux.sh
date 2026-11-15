@@ -18,8 +18,13 @@ export DOTNET_CLI_TELEMETRY_OPTOUT=1
 echo "== prerequisites (deliberately NOT libgtk-4: the bindings fetch it) =="
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -qq
+# fonts-dejavu-core: a bare container has no fonts at all, so Pango measures
+# bold and regular identically and the attribute tests fail. at-spi2-core: the
+# accessibility tests need a real GtkATContext, which the AT-SPI backend only
+# provides when its bus is reachable.
 apt-get install -y -qq --no-install-recommends \
-  ca-certificates curl git dbus libicu-dev xvfb xauth procps
+  ca-certificates curl git dbus libicu-dev xvfb xauth procps \
+  fonts-dejavu-core at-spi2-core
 
 echo "== guard: the host must not already provide Gtk 4 =="
 if command -v ldconfig >/dev/null 2>&1 && ldconfig -p | grep -q 'libgtk-4\.so'; then
@@ -39,16 +44,17 @@ dotnet build Source/Tests/GtkSharp.Tests -c Release
 
 # Headless-container GUI environment, independent of which runtime is loaded.
 export GDK_BACKEND=x11            # the display is Xvfb
-export GTK_A11Y=none             # no accessibility bus in the container
 export GSETTINGS_BACKEND=memory  # no dconf daemon
 export GTKSHARP_TESTS_SKIP_WEBKIT=1
 export XDG_RUNTIME_DIR="$(mktemp -d)"
 
 RUNTIME_DIR="$HOME/.local/share/GtkSharp"
 ENVP="$RUNTIME_DIR/4.22.4/env"
-# libadwaita is not IsSupported-guarded in the suite, so the fetch must include
-# it (and the desktop schemas it reads); GtkSourceView/WebKit tests are guarded.
-export GTKSHARP_CONDA_PACKAGES="gtk4 libadwaita gsettings-desktop-schemas"
+# libadwaita and gtksourceview are not IsSupported-guarded in the suite (a
+# sample MainWindow builds a SourceView unconditionally), so the fetch must
+# include them, plus the desktop schemas libadwaita reads. WebKit tests are
+# guarded and WebKit is skipped here.
+export GTKSHARP_CONDA_PACKAGES="gtk4 libadwaita gtksourceview gsettings-desktop-schemas"
 
 echo "== phase 1: dogfood the on-demand fetch through the real C# path =="
 rm -rf "$RUNTIME_DIR"

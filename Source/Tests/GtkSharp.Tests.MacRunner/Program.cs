@@ -85,6 +85,11 @@ internal static class Program
             {
                 _currentTest = info.TestDisplayName;
                 _testsStarted = true;
+                // Flushed per test so the last line before a native crash
+                // (SIGSEGV kills the process before the watchdog can report)
+                // names the test that was running.
+                Console.Error.WriteLine("RUN " + info.TestDisplayName);
+                Console.Error.Flush();
                 Touch();
             };
             runner.OnTestFinished = _ => Touch();

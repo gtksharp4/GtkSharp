@@ -1101,10 +1101,12 @@ namespace GtkSharp.Tests
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
                 GC.Collect();
+                GC.WaitForPendingFinalizers();
 
-                // The queued frees are on a 50 ms timeout, so the loop has to
-                // turn for longer than that before any of them has run.
-                Pump.For(250);
+                // The queued frees are deferred onto the main loop. Run them
+                // directly rather than pumping the loop (which hangs on the
+                // headless macOS runner).
+                GLib.Object.RunPendingFrees();
 
                 // Surviving is not the assertion -- a corrupted heap does not
                 // always fault at once. The assertion is that graphene still

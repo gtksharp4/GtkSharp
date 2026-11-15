@@ -20,10 +20,10 @@ namespace Gtk {
 
 	public partial class MessageDialog {
 		[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-		delegate IntPtr d_gtk_message_dialog_new(IntPtr parent_window, DialogFlags flags, MessageType type, ButtonsType bt, IntPtr msg, IntPtr args);
+		delegate IntPtr d_gtk_message_dialog_new(IntPtr parent_window, DialogFlags flags, MessageType type, ButtonsType bt, IntPtr msg);
 		static d_gtk_message_dialog_new gtk_message_dialog_new = FuncLoader.LoadFunction<d_gtk_message_dialog_new>(FuncLoader.GetProcAddress(GLibrary.Load(Library.Gtk), "gtk_message_dialog_new"));
 		[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-		delegate IntPtr d_gtk_message_dialog_new_with_markup(IntPtr parent_window, DialogFlags flags, MessageType type, ButtonsType bt, IntPtr msg, IntPtr args);
+		delegate IntPtr d_gtk_message_dialog_new_with_markup(IntPtr parent_window, DialogFlags flags, MessageType type, ButtonsType bt, IntPtr msg);
 		static d_gtk_message_dialog_new_with_markup gtk_message_dialog_new_with_markup = FuncLoader.LoadFunction<d_gtk_message_dialog_new_with_markup>(FuncLoader.GetProcAddress(GLibrary.Load(Library.Gtk), "gtk_message_dialog_new_with_markup"));
 
 		public MessageDialog (Gtk.Window parent_window, DialogFlags flags, MessageType type, ButtonsType bt, bool use_markup, string format, params object[] args) : base (IntPtr.Zero)
@@ -31,30 +31,26 @@ namespace Gtk {
 			IntPtr p = (parent_window != null) ? parent_window.Handle : IntPtr.Zero;
 
 			if (format == null) {
-				Raw = gtk_message_dialog_new (p, flags, type, bt, IntPtr.Zero, IntPtr.Zero);
+				Raw = gtk_message_dialog_new (p, flags, type, bt, IntPtr.Zero);
 				return;
 			}
 
-			// String.Format, not Marshaller.StringFormat. The latter doubles every
-			// per cent sign, which was the right thing to do while the composed
-			// message was being handed to Gtk as message_format -- printf would
-			// turn "%%" back into "%". Now that the format is a literal "%s" and
-			// the message is the argument behind it, nothing will un-double them,
-			// and the dialog would read "100%% complete".
-			//
-			// Passing text as data rather than as a format is the more robust of
-			// the two arrangements: it cannot be got wrong by a message that
-			// happens to contain a conversion this escaping did not anticipate.
-			IntPtr nmsg = GLib.Marshaller.StringToPtrGStrdup (String.Format (format, args));
-			IntPtr nformat = GLib.Marshaller.StringToPtrGStrdup ("%s");
+			// Pass the composed text as the message_format with every per cent
+			// sign doubled and no variadic argument. The "%s"-with-the-text-behind
+			// it form is correct on x64 but reads garbage on Apple arm64, where the
+			// variadic argument is passed on the stack, not the register a
+			// fixed-arity delegate puts it in -- the dialog showed mojibake.
+			// Doubling the per cent signs lets Gtk's printf render them back to
+			// one, for plain text and markup alike, with no va_list ever read.
+			var message = args != null && args.Length > 0 ? String.Format (format, args) : format;
+			IntPtr nmsg = GLib.Marshaller.StringToPtrGStrdup (message.Replace ("%", "%%"));
 
 			if (use_markup)
-				Raw = gtk_message_dialog_new_with_markup (p, flags, type, bt, nformat, nmsg);
+				Raw = gtk_message_dialog_new_with_markup (p, flags, type, bt, nmsg);
 			else
-				Raw = gtk_message_dialog_new (p, flags, type, bt, nformat, nmsg);
+				Raw = gtk_message_dialog_new (p, flags, type, bt, nmsg);
 
 			GLib.Marshaller.Free (nmsg);
-			GLib.Marshaller.Free (nformat);
 		}
 
 		public MessageDialog (Gtk.Window parent_window, DialogFlags flags, MessageType type, ButtonsType bt, string format, params object[] args) : this (parent_window, flags, type, bt, true, format, args) {}

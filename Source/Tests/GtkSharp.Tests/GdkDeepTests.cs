@@ -943,11 +943,13 @@ namespace GtkSharp.Tests
                     GC.Collect();
                     GC.WaitForPendingFinalizers();
                     GC.Collect();
+                    GC.WaitForPendingFinalizers();
 
-                    // The generated finalizer does not unref: it queues the
-                    // unref onto the main loop with a 50 ms timeout, so a double
-                    // free only surfaces once the loop has run.
-                    Pump.For(400);
+                    // The generated finalizer does not unref: it queues the unref
+                    // onto the main loop. Run the queued frees directly rather than
+                    // pumping the loop (which hangs on the headless macOS runner);
+                    // a double free surfaces now as a GLib critical.
+                    GLib.Object.RunPendingFrees();
                 }
                 finally
                 {

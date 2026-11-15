@@ -33,6 +33,20 @@ namespace GtkSharp.Tests
         public static bool GtkAtLeast(uint major, uint minor)
             => Gtk.GtkVersion.AtLeast(major, minor);
 
+        /// <summary>
+        /// Running under the macOS CI runner (GtkSharp.Tests.MacRunner, Quartz).
+        /// </summary>
+        /// <remarks>
+        /// A handful of tests cannot run there: the headless window server does
+        /// not advance a shown window's frame clock, so a test that presents a
+        /// widget and waits for its resize or redraw blocks the Gtk thread; and
+        /// the Gdk keymap carries no entries, so keycode and accelerator
+        /// round-trips come back empty. These run on Windows and Linux. Guard the
+        /// specific cases with a reason, the way WebKit ones are guarded -- never
+        /// a blanket macOS skip.
+        /// </remarks>
+        public static bool IsMacOS { get; } = OperatingSystem.IsMacOS();
+
         /// <summary>A skip reason naming the symbol and the Gtk that lacks it.</summary>
         public static string NeedsGtk(uint major, uint minor, string symbol)
             => $"{symbol} arrived in Gtk {major}.{minor}; this is {GtkVersion}.";

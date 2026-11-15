@@ -317,9 +317,15 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Resizing_the_area_announces_the_new_size()
         {
+            // Hangs on the headless macOS runner: presenting the area and waiting
+            // for its frame-clock-driven resize/redraw blocks the Gtk thread,
+            // which the CI window server never advances. Covered on Windows/Linux.
+            Skip.If(TestEnvironment.IsMacOS,
+                    "headless macOS does not advance the frame clock; the resize never arrives.");
+
             Run(() =>
             {
                 var area = new Gtk.DrawingArea();

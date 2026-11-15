@@ -254,16 +254,16 @@ namespace Gdk {
 				return result;
 			}
 		}
-		[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-		delegate bool d_gdk_pixbuf_save(IntPtr raw, IntPtr filename, IntPtr type, out IntPtr error, IntPtr dummy);
-		static d_gdk_pixbuf_save gdk_pixbuf_save = FuncLoader.LoadFunction<d_gdk_pixbuf_save>(FuncLoader.GetProcAddress(GLibrary.Load(Library.GdkPixbuf), 
-			FuncLoader.IsWindows ? "gdk_pixbuf_save_utf8" : "gdk_pixbuf_save"));
-
-		public unsafe bool Save(string filename, string type) {
+		// Uses the savev (array) form defined below, not the variadic
+		// gdk_pixbuf_save: the latter takes a NULL-terminated option list, and on
+		// Apple arm64 that trailing NULL is passed as a register argument the
+		// native code reads off the stack, so the save walked into garbage and
+		// segfaulted. No options here, so the key/value arrays are null.
+		public bool Save(string filename, string type) {
 			IntPtr error = IntPtr.Zero;
 			IntPtr nfilename = GLib.Marshaller.StringToPtrGStrdup (filename);
 			IntPtr ntype = GLib.Marshaller.StringToPtrGStrdup (type);
-			bool ret = gdk_pixbuf_save(Handle, nfilename, ntype, out error, IntPtr.Zero);
+			bool ret = gdk_pixbuf_savev(Handle, nfilename, ntype, null, null, out error);
 			GLib.Marshaller.Free (nfilename);
 			GLib.Marshaller.Free (ntype);
 			if (error != IntPtr.Zero) throw new GLib.GException (error);
@@ -363,15 +363,17 @@ namespace Gdk {
 			return saved;
 		}
 
-		[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-		delegate bool d_gdk_pixbuf_save_to_stream(IntPtr raw, IntPtr stream, IntPtr type, IntPtr cancellable, out IntPtr error, IntPtr dummy);
-		static d_gdk_pixbuf_save_to_stream gdk_pixbuf_save_to_stream = FuncLoader.LoadFunction<d_gdk_pixbuf_save_to_stream>(FuncLoader.GetProcAddress(GLibrary.Load(Library.GdkPixbuf), "gdk_pixbuf_save_to_stream"));
-
-		public unsafe bool SaveToStream(GLib.OutputStream stream, string type, GLib.Cancellable cancellable)
+		public bool SaveToStream(GLib.OutputStream stream, string type, GLib.Cancellable cancellable)
 		{
 			IntPtr error = IntPtr.Zero;
 			IntPtr native_type = GLib.Marshaller.StringToPtrGStrdup(type);
-			bool ret = gdk_pixbuf_save_to_stream(Handle, stream == null ? IntPtr.Zero : stream.Handle, native_type, cancellable == null ? IntPtr.Zero : cancellable.Handle, out error, IntPtr.Zero);
+			// The streamv (array) form, not the variadic gdk_pixbuf_save_to_stream
+			// whose NULL option terminator crashes on Apple arm64 (see Save). No
+			// options here, so the key/value arrays are null.
+			bool ret = gdk_pixbuf_save_to_streamv(Handle,
+				stream == null ? IntPtr.Zero : stream.Handle, native_type,
+				null, null,
+				cancellable == null ? IntPtr.Zero : cancellable.Handle, out error);
 			GLib.Marshaller.Free(native_type);
 
 			if (error != IntPtr.Zero)

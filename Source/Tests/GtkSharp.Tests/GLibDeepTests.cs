@@ -44,8 +44,13 @@ namespace GtkSharp.Tests
         {
             // The same candidate list Source/Libs/Shared/GLibrary.cs carries,
             // ordered {windows, linux, macos}. GLib is already resident by the
-            // time any test runs, so this resolves the loaded module.
-            foreach (var name in new[] { "glib-2.0-0.dll", "libglib-2.0.so.0", "libglib-2.0.0.dylib", "libglib-2.0-0.dll" })
+            // time any test runs, so this resolves the loaded module. On macOS the
+            // dylib was loaded by full Homebrew path, and a bare name is not on the
+            // dlopen search path, so the Homebrew prefixes are tried too -- the
+            // same ones GLibrary falls back to.
+            foreach (var name in new[] {
+                         "glib-2.0-0.dll", "libglib-2.0.so.0", "libglib-2.0.0.dylib", "libglib-2.0-0.dll",
+                         "/opt/homebrew/lib/libglib-2.0.0.dylib", "/usr/local/lib/libglib-2.0.0.dylib" })
                 if (NativeLibrary.TryLoad(name, out var handle))
                     return handle;
 

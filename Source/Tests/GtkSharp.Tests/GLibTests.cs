@@ -62,11 +62,13 @@ namespace GtkSharp.Tests
             Assert.Equal(data, bytes.Data);
         }
 
-        [Fact]
+        [SkippableFact]
         public void Idle_runs_the_handler_on_the_main_loop()
         {
             // Idle and Timeout are how anything gets back onto the main loop, so
             // a break here is invisible until callbacks silently stop arriving.
+            Skip.If(TestEnvironment.IsMacOS,
+                    "headless macOS cannot pump the main loop (Quartz frame-clock block).");
             Run(() =>
             {
                 int calls = 0;
@@ -84,9 +86,11 @@ namespace GtkSharp.Tests
             });
         }
 
-        [Fact]
+        [SkippableFact]
         public void Timeout_stops_being_called_once_it_returns_false()
         {
+            Skip.If(TestEnvironment.IsMacOS,
+                    "headless macOS cannot pump the main loop (Quartz frame-clock block).");
             Run(() =>
             {
                 int calls = 0;

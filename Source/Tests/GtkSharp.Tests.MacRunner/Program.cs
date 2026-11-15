@@ -46,6 +46,14 @@ internal static class Program
             return 2;
         }
 
+        // This process only runs on macOS (test-macos.sh), so mark the headless
+        // Quartz environment for TestEnvironment.IsMacOS -- OperatingSystem.IsMacOS
+        // is not relied on alone, having come back false here under the runner.
+        Environment.SetEnvironmentVariable(TestEnvironment.MacRunnerEnvVar, "1");
+        Console.Error.WriteLine(
+            $"MacRunner OS check: OperatingSystem.IsMacOS()={OperatingSystem.IsMacOS()}, " +
+            $"{RuntimeInformation.OSDescription}");
+
         GtkThreadBridge.Queue = new BlockingCollection<Action>();
 
         Touch();

@@ -45,7 +45,17 @@ namespace GtkSharp.Tests
         /// specific cases with a reason, the way WebKit ones are guarded -- never
         /// a blanket macOS skip.
         /// </remarks>
-        public static bool IsMacOS { get; } = OperatingSystem.IsMacOS();
+        public static bool IsMacOS { get; } =
+            OperatingSystem.IsMacOS()
+            || Environment.GetEnvironmentVariable(MacRunnerEnvVar) == "1";
+
+        /// <summary>
+        /// Set by GtkSharp.Tests.MacRunner, which only runs on macOS. The guard
+        /// keys on this as well as <see cref="OperatingSystem.IsMacOS"/> because
+        /// the runner is the definitive signal that this is the headless Quartz
+        /// environment the skips exist for.
+        /// </summary>
+        public const string MacRunnerEnvVar = "GTKSHARP_MACRUNNER";
 
         /// <summary>A skip reason naming the symbol and the Gtk that lacks it.</summary>
         public static string NeedsGtk(uint major, uint minor, string symbol)

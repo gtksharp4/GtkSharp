@@ -44,14 +44,16 @@ namespace GtkSharp.Tests
             return iter;
         }
 
+        // GtkSource async save/load/highlight tests wait on a callback through the
+        // main loop, which the headless macOS runner cannot pump. They are gated
+        // at their start (before the async op, so nothing is left pending to fire
+        // after the temp file is gone) and here as a backstop.
+        const string MacAsyncSkip =
+            "headless macOS cannot pump the main loop for a GtkSource async callback.";
+
         static bool PumpUntil(Func<bool> condition, int timeoutMs = 5000)
         {
-            // These tests wait for a GtkSource async file save/load callback,
-            // which only arrives when the main loop is pumped -- impossible on the
-            // headless macOS runner (Quartz blocks the iteration). Covered on
-            // Windows and Linux.
-            Skip.If(TestEnvironment.IsMacOS,
-                    "headless macOS cannot pump the main loop for a GtkSource async callback.");
+            Skip.If(TestEnvironment.IsMacOS, MacAsyncSkip);
 
             var clock = System.Diagnostics.Stopwatch.StartNew();
             while (!condition() && clock.ElapsedMilliseconds < timeoutMs)
@@ -240,6 +242,7 @@ namespace GtkSharp.Tests
         [SkippableFact]
         public void Context_classes_say_which_part_of_the_syntax_an_iterator_is_in()
         {
+            Skip.If(TestEnvironment.IsMacOS, MacAsyncSkip);
             // The feature an editor uses to decide whether the cursor is inside a
             // comment or a string. GtkSourceView computes it from the language
             // definition, so the oracle is the code the test wrote.
@@ -338,6 +341,7 @@ namespace GtkSharp.Tests
         [SkippableFact]
         public void A_buffer_saved_through_GtkSource_File_lands_on_disk_as_its_text()
         {
+            Skip.If(TestEnvironment.IsMacOS, MacAsyncSkip);
             // The oracle is entirely outside the library: the bytes File.ReadAllText
             // gets back are the ones the test can check without asking
             // GtkSourceView anything.
@@ -385,6 +389,7 @@ namespace GtkSharp.Tests
         [SkippableFact]
         public void A_buffer_loaded_through_GtkSource_File_holds_what_the_file_held()
         {
+            Skip.If(TestEnvironment.IsMacOS, MacAsyncSkip);
             // The other direction, and the text came from the test rather than
             // from a previous call to the library.
             Run(() =>
@@ -446,6 +451,7 @@ namespace GtkSharp.Tests
         [SkippableFact]
         public void Turning_the_implicit_newline_off_writes_the_text_unchanged()
         {
+            Skip.If(TestEnvironment.IsMacOS, MacAsyncSkip);
             Run(() =>
             {
                 var path = Path.Combine(Path.GetTempPath(),

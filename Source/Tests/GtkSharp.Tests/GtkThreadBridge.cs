@@ -36,7 +36,16 @@ namespace GtkSharp.Tests
         {
             foreach (var work in Queue.GetConsumingEnumerable())
             {
-                work();
+                // Each work item already captures its own body's exceptions
+                // (GtkFixture.Invoke) and releases its waiter in a finally, so a
+                // throw out of work() here is a stray one -- a native callback
+                // from an async op a skipped test left pending, firing during a
+                // later pump. Swallow it so one does not abort the whole run.
+                try { work(); }
+                catch (Exception e)
+                {
+                    Console.Error.WriteLine("MacRunner: ignored a stray Gtk-thread exception: " + e.Message);
+                }
 
                 // No between-test drain here, unlike the owned-thread fixture.
                 // On the macOS Quartz backend Application.EventsPending blocks

@@ -16,6 +16,7 @@
         <None Remove="**\*.in.*" />
         <None Update="@(None)" PackagePath="" CopyToOutputDirectory="PreserveNewest" Pack="true" />
         <None Include="$(_GtkSharpSourceDirectory)Libs\GtkSharp\GtkSharp.targets" Link="targets\GtkSharp.targets" CopyToOutputDirectory="PreserveNewest" Pack="true" PackagePath="targets" Visible="false" />
+        <None Include="$(_GtkSharpSourceDirectory)Libs\GtkSharp\Icon.ico" Link="targets\GtkSharp.ico" CopyToOutputDirectory="PreserveNewest" Pack="true" PackagePath="targets\GtkSharp.ico" Visible="false" />
     </ItemGroup>
     <!-- Build-time only: PrivateAssets keeps it out of the produced package. The
        condition is on the build host, so packages published by CI (which packs

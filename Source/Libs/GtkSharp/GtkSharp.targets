@@ -20,6 +20,17 @@
     <GtkDir Condition=" '$(GtkDir)' == '' ">$(LOCALAPPDATA)\Gtk\4.22.4</GtkDir>
   </PropertyGroup>
 
+  <!--
+    Default Windows icon for an application: the exe icon is what the taskbar,
+    Explorer and Alt+Tab show, and GDK registers it as the window class icon.
+    Without it GDK falls back to the icon inside gtk-4-1.dll.
+    GtkSharp.ico ships next to this file in every package that carries it.
+    A project that sets ApplicationIcon or Win32Resource keeps its own.
+  -->
+  <PropertyGroup Condition=" '$(ApplicationIcon)' == '' and '$(Win32Resource)' == '' and ('$(OutputType)' == 'Exe' or '$(OutputType)' == 'WinExe') and Exists('$(MSBuildThisFileDirectory)GtkSharp.ico') ">
+    <ApplicationIcon>$(MSBuildThisFileDirectory)GtkSharp.ico</ApplicationIcon>
+  </PropertyGroup>
+
   <Target Name="InstallGtk" BeforeTargets="Build" Condition=" '$(SkipGtkInstall)' != 'True' and '$(OS)' == 'Windows_NT' and !Exists('$(GtkDir)/bin/gtk-4-1.dll') ">
     <Message Importance="High" Text="Gtk has not been detected, downloading and installing it, set SkipGtkInstall to True to skip theese steps."/>
     <Message Importance="High" Text="The Gtk 4 bundle is around 300 MB, so the first build takes a while."/>

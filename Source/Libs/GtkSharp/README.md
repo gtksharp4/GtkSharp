@@ -22,6 +22,10 @@ On Windows that runtime is installed for you: this package pulls in
 `%LOCALAPPDATA%\Gtk\4.22.4` before the first build. Set
 `SkipGtkInstall=true` to manage it yourself.
 
+The same targets give an application (`OutputType` `Exe` or `WinExe`) the
+GtkSharp icon on Windows, the one shown in the taskbar and title bar. Set
+`ApplicationIcon` to your own `.ico` to replace it.
+
 This is the package to start from. It pulls in the rest of the stack it needs, and it is the one that installs a Gtk runtime on Windows.
 
 ## How it binds

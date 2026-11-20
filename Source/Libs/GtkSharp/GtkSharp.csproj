@@ -43,6 +43,8 @@
              carries the same file to consumers of a package that references GtkSharp4;
              the target is idempotent, so a direct consumer getting both is harmless. -->
         <Content Include="GtkSharp.targets" PackagePath="build\$(PackageId).targets;buildTransitive\$(PackageId).targets" />
+        <!-- The default ApplicationIcon GtkSharp.targets points consumers at. -->
+        <Content Include="Icon.ico" PackagePath="build\GtkSharp.ico;buildTransitive\GtkSharp.ico" />
     </ItemGroup>
     <!-- Build-time only: PrivateAssets keeps it out of the produced package. The
        condition is on the build host, so packages published by CI (which packs

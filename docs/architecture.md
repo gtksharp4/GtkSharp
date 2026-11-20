@@ -334,7 +334,11 @@ you go looking for the metadata rule that does not exist:
   Windows, downloads and unzips a gvsbuild Gtk 4 runtime into
   `%LOCALAPPDATA%\Gtk\4.22.4` unless `SkipGtkInstall=True`. The bundle is a full
   install tree, so the DLLs land in `bin/` with no `lib` prefix — `GLibrary`'s
-  `SetDllDirectory` must stay in step with `GtkDir`.
+  `SetDllDirectory` must stay in step with `GtkDir`. It also defaults an
+  application's `ApplicationIcon` to `GtkSharp.ico` (from `Libs/GtkSharp/Icon.ico`),
+  which ships next to it. GDK uses the exe icon as the window class icon and
+  falls back to the old cube icon inside `gtk-4-1.dll`; Gtk 4 sets no
+  per-window icon on Windows.
 
 **gvsbuild ships no WebKit.** `WebkitGtkSharp` and `JavaScriptCoreSharp` are
 Linux/macOS in practice, which is why those tests skip on Windows and why some

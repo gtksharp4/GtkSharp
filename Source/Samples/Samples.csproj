@@ -4,6 +4,8 @@
     <TargetFramework>net10.0</TargetFramework>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <OutputPath>..\..\BuildOutput\Samples</OutputPath>
+    <!-- Package consumers get this from GtkSharp.targets; a ProjectReference does not import it. -->
+    <ApplicationIcon>..\Libs\GtkSharp\Icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <!-- Gtk 4 reads GtkBuilder XML as .ui; the Gtk 3 samples used Glade's
